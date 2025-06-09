@@ -44,12 +44,13 @@ export default function IconLabelLayer({
         const pos = polarToCartesian(center, center, radius, angle);
         const boxWidth = iconSize * 2.8;
         const boxHeight = iconSize * 2.7;
-
+        // Offset for first sector to prevent label cutoff
+        const xOffset = i === 0 ? boxWidth * 0.18 : 0;
         return (
           <foreignObject
             key={i}
-            // Center the icon and label at the calculated position
-            x={pos.x - boxWidth / 2}
+            // Center the icon and label at the calculated position, with offset for first sector
+            x={pos.x - boxWidth / 2 + xOffset}
             y={pos.y - boxHeight / 2}
             width={boxWidth}
             height={boxHeight}

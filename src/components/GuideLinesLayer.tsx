@@ -5,6 +5,7 @@ interface GuideLinesLayerProps {
   center: number;
   innerRadius: number;
   outerRadius: number;
+  iconSize: number; // NEW: pass iconSize for guideline adjustment
 }
 
 // Convert polar coordinates to cartesian for SVG line endpoints
@@ -14,7 +15,7 @@ function polarToCartesian(cx: number, cy: number, r: number, angleDeg: number) {
 }
 
 export default function GuideLinesLayer({
-  sectors, center, innerRadius, outerRadius
+  sectors, center, innerRadius, outerRadius, iconSize
 }: GuideLinesLayerProps) {
   // Animation state: track which guidelines are visible
   const [visible, setVisible] = useState(Array(sectors.length).fill(false));
@@ -37,7 +38,9 @@ export default function GuideLinesLayer({
       {sectors.map((s, i) => {
         const angle = s.angle;
         const p1 = polarToCartesian(center, center, innerRadius + 10, angle);
-        const p2 = polarToCartesian(center, center, outerRadius - 10, angle);
+        // Shorten guideline so it ends before the icon/label
+        const guidelineEndRadius = outerRadius - (iconSize * 1.4); // adjust as needed
+        const p2 = polarToCartesian(center, center, guidelineEndRadius, angle);
         // Animate line drawing using strokeDasharray and strokeDashoffset
         const length = Math.hypot(p2.x - p1.x, p2.y - p1.y);
         return (

@@ -79,6 +79,7 @@ export default function ResponsiveRadarChart({ values }: { values: number[] }) {
           center={center}
           innerRadius={guidelineInner}
           outerRadius={guidelineOuter}
+          iconSize={iconSize} // Pass iconSize for guideline adjustment
         />
 
         {/* Render icons and labels for each sector */}
