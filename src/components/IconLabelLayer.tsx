@@ -1,6 +1,6 @@
 import React from 'react';
 
-// Converts polar coordinates to cartesian coordinates for SVG placement
+// Convert polar coordinates to cartesian for SVG placement
 function polarToCartesian(cx: number, cy: number, r: number, angleInDegrees: number) {
   const angleInRadians = ((angleInDegrees - 90) * Math.PI) / 180;
   return {
@@ -25,7 +25,7 @@ export default function IconLabelLayer({
   return (
     <g>
       {sectors.map((s, i) => {
-        // Use the explicit angle from the sector
+        // Place each icon and label at the correct angle and distance
         const angle = s.angle;
         const pos = polarToCartesian(center, center, radius, angle);
         const boxWidth = iconSize * 2.8;
@@ -34,13 +34,13 @@ export default function IconLabelLayer({
         return (
           <foreignObject
             key={i}
-            // Position the icon and label centered at the calculated position
+            // Center the icon and label at the calculated position
             x={pos.x - boxWidth / 2}
             y={pos.y - boxHeight / 2}
             width={boxWidth}
             height={boxHeight}
           >
-            {/* Render icon and label in a flex column */}
+            {/* Render icon and label in a vertical flex layout */}
             <div style={{
               display: 'flex',
               flexDirection: 'column',
@@ -48,11 +48,11 @@ export default function IconLabelLayer({
               justifyContent: 'flex-start',
               width: '100%',
               height: '100%',
-              fontSize: fontSize * 0.45, // slightly smaller font for better fit
+              fontSize: fontSize * 0.45,
               textAlign: 'center',
               lineHeight: 1.1,
               color: '#000',
-              padding: '10px 16px', // more vertical and horizontal padding
+              padding: '10px 16px',
               boxSizing: 'border-box',
             }}>
               <img src={s.icon} alt={s.label} style={{ width: iconSize, height: iconSize }} />
@@ -61,7 +61,7 @@ export default function IconLabelLayer({
                 overflowWrap: 'break-word',
                 wordBreak: 'break-word',
                 width: '100%',
-                whiteSpace: 'normal', // allow wrapping
+                whiteSpace: 'normal',
               }}>{s.label}</div>
             </div>
           </foreignObject>

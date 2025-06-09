@@ -1,6 +1,6 @@
 import ResponsiveRadarChart from './components/ResponsiveRadarChart';
 
-// Section keys for URL parameter parsing
+// Section keys correspond to URL parameters for each wellness category
 const SECTION_KEYS = [
   "bewegung",
   "ernaehrung_genuss",
@@ -10,7 +10,7 @@ const SECTION_KEYS = [
   "umwelt_soziales",
 ];
 
-// Parse strengths from URL parameters, fallback to 2 if not present
+// Parse strengths from URL parameters, defaulting to 2 if not present or invalid
 function parseStrengths(): number[] {
   const params = new URLSearchParams(window.location.search);
   return SECTION_KEYS.map(key => {
@@ -20,7 +20,7 @@ function parseStrengths(): number[] {
 }
 
 export default function App() {
-  // Get values from URL
+  // Get values for each sector from the URL
   const values = parseStrengths();
   return (
     <div className="w-screen h-screen flex items-center justify-center bg-white">

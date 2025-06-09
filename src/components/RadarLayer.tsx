@@ -1,6 +1,6 @@
 import React from 'react';
 
-// Converts polar coordinates to cartesian coordinates for SVG
+// Convert polar coordinates to cartesian coordinates for SVG rendering
 function polarToCartesian(cx: number, cy: number, r: number, angleInDegrees: number) {
   const angleInRadians = ((angleInDegrees - 90) * Math.PI) / 180;
   return {
@@ -9,7 +9,7 @@ function polarToCartesian(cx: number, cy: number, r: number, angleInDegrees: num
   };
 }
 
-// Returns SVG arc path for a given circle segment
+// Generate an SVG arc path for a circular segment
 function describeArc(cx: number, cy: number, r: number, startAngle: number, endAngle: number) {
   const start = polarToCartesian(cx, cy, r, endAngle);
   const end = polarToCartesian(cx, cy, r, startAngle);
@@ -43,17 +43,17 @@ export default function RadarLayer({
   useUniformSectorColor?: boolean;
 }) {
   const totalSectors = sectors.length;
-  const sectorArcAngle = 60; // 360 / 6
-  const sectorGap = 6; // degrees of gap between sectors
+  const sectorArcAngle = 60; // Each sector covers 60 degrees (360/6)
+  // Render radar bars for each sector and value
   return (
     <g>
       {values.map((strength, sectorIndex) => {
         const baseAngle = sectors[sectorIndex].angle;
         return Array.from({ length: max }, (_, barIndex) => {
           const r = radius + barIndex * (barWidth + gap);
-          // Dynamically reduce the sector gap for outer bars
-          const minSectorGap = 2; // minimum gap in degrees for outermost bar
-          const maxSectorGap = 6; // maximum gap in degrees for innermost bar
+          // Dynamically adjust the sector gap for each bar
+          const minSectorGap = 2; // Minimum gap for outermost bar
+          const maxSectorGap = 6; // Maximum gap for innermost bar
           const sectorGap = maxSectorGap - ((maxSectorGap - minSectorGap) * barIndex) / (max - 1);
           const arcAngle = sectorArcAngle - sectorGap;
           const startAngle = baseAngle - arcAngle / 2;

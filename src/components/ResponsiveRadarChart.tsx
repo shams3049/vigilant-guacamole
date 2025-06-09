@@ -3,7 +3,7 @@ import RadarLayer from './RadarLayer';
 import GuideLinesLayer from './GuideLinesLayer';
 import IconLabelLayer from './IconLabelLayer';
 
-// Sectors for the radar chart, each with a label, icon, and angle (degrees from top, clockwise)
+// Define the radar chart sectors with their labels, icons, and angles
 const SECTORS = [
   { label: 'Bewegung', icon: '/assets/bewegung.svg', angle: -90 },
   { label: 'Ernährung & Genuss', icon: '/assets/ernaehrung_genuss.svg', angle: -30 },
@@ -14,13 +14,13 @@ const SECTORS = [
 ];
 
 export default function ResponsiveRadarChart({ values }: { values: number[] }) {
-  // Ref for the container div
+  // Reference to the chart container for responsive sizing
   const containerRef = useRef<HTMLDivElement>(null);
-  // State for the chart size
+  // State to store the current chart size
   const [size, setSize] = useState(300);
 
   useLayoutEffect(() => {
-    // Resize handler to keep chart responsive
+    // Update chart size based on container dimensions
     const resize = () => {
       const rect = containerRef.current?.getBoundingClientRect();
       if (rect) setSize(Math.min(rect.width, rect.height));
@@ -30,10 +30,10 @@ export default function ResponsiveRadarChart({ values }: { values: number[] }) {
     return () => window.removeEventListener('resize', resize);
   }, []);
 
-  // Calculate chart geometry
+  // Calculate geometry and layout values for the chart
   const center = size / 2;
   const max = 9;
-  const radius = size * 0.095; // restore original value
+  const radius = size * 0.095;
   const barWidth = size * 0.021;
   const gap = size * 0.007;
   const iconRadius = size * 0.48;
@@ -41,14 +41,14 @@ export default function ResponsiveRadarChart({ values }: { values: number[] }) {
   const guidelineOuter = iconRadius - 12;
   const iconSize = Math.min(size * 0.08, 36);
   const fontSize = size * 0.024;
-  // Calculate average value and percent
+  // Calculate the average value and its percentage
   const avg = values.reduce((a, b) => a + b, 0) / values.length;
   const avgPercent = Math.round((avg / max) * 100);
 
   return (
     <div ref={containerRef} className="w-full h-full flex items-center justify-center">
       <svg width={size} height={size}>
-        {/* Center circle and average percent */}
+        {/* Center circle and average percent display */}
         <circle cx={center} cy={center} r={size * 0.07} fill="#ccc" />
         <text
           x={center}
@@ -61,7 +61,7 @@ export default function ResponsiveRadarChart({ values }: { values: number[] }) {
           {avgPercent}%
         </text>
 
-        {/* Radar bars */}
+        {/* Render radar bars for each sector */}
         <RadarLayer
           values={values}
           center={center}
@@ -73,7 +73,7 @@ export default function ResponsiveRadarChart({ values }: { values: number[] }) {
           useUniformSectorColor={true}
         />
 
-        {/* Guidelines */}
+        {/* Render guidelines between sectors */}
         <GuideLinesLayer
           sectors={SECTORS}
           center={center}
@@ -81,7 +81,7 @@ export default function ResponsiveRadarChart({ values }: { values: number[] }) {
           outerRadius={guidelineOuter}
         />
 
-        {/* Icons and labels */}
+        {/* Render icons and labels for each sector */}
         <IconLabelLayer
           sectors={SECTORS}
           center={center}
