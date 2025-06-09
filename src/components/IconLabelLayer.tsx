@@ -16,20 +16,17 @@ export default function IconLabelLayer({
   iconSize,
   fontSize,
 }: {
-  sectors: { label: string; icon: string }[];
+  sectors: { label: string; icon: string; angle: number }[];
   center: number;
   radius: number;
   iconSize: number;
   fontSize: number;
 }) {
-  // Calculate the angle between each sector
-  const angleStep = 360 / sectors.length;
-
   return (
     <g>
       {sectors.map((s, i) => {
-        // Calculate the position for each icon/label
-        const angle = -90 + i * angleStep;
+        // Use the explicit angle from the sector
+        const angle = s.angle;
         const pos = polarToCartesian(center, center, radius, angle);
         const boxWidth = iconSize * 1.6;
         const boxHeight = iconSize * 2.1;

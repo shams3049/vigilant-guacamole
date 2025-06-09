@@ -3,14 +3,14 @@ import RadarLayer from './RadarLayer';
 import GuideLinesLayer from './GuideLinesLayer';
 import IconLabelLayer from './IconLabelLayer';
 
-// Sectors for the radar chart, each with a label and icon
+// Sectors for the radar chart, each with a label, icon, and angle (degrees from top, clockwise)
 const SECTORS = [
-  { label: 'Bewegung', icon: '/assets/bewegung.svg' },
-  { label: 'Ernährung & Genuss', icon: '/assets/ernaehrung_genuss.svg' },
-  { label: 'Stress & Erholung', icon: '/assets/stress_erholung.svg' },
-  { label: 'Geist & Emotion', icon: '/assets/geist_emotion.svg' },
-  { label: 'Lebenssinn & -qualität', icon: '/assets/lebenssinn_qualitaet.svg' },
-  { label: 'Umwelt & Soziales', icon: '/assets/umwelt_soziales.svg' },
+  { label: 'Bewegung', icon: '/assets/bewegung.svg', angle: -90 },
+  { label: 'Ernährung & Genuss', icon: '/assets/ernaehrung_genuss.svg', angle: -30 },
+  { label: 'Stress & Erholung', icon: '/assets/stress_erholung.svg', angle: 30 },
+  { label: 'Geist & Emotion', icon: '/assets/geist_emotion.svg', angle: 90 },
+  { label: 'Lebenssinn & -qualität', icon: '/assets/lebenssinn_qualitaet.svg', angle: 150 },
+  { label: 'Umwelt & Soziales', icon: '/assets/umwelt_soziales.svg', angle: 210 },
 ];
 
 export default function ResponsiveRadarChart({ values }: { values: number[] }) {
@@ -41,8 +41,6 @@ export default function ResponsiveRadarChart({ values }: { values: number[] }) {
   const guidelineOuter = iconRadius - 12;
   const iconSize = Math.min(size * 0.08, 36);
   const fontSize = size * 0.024;
-  const angleStep = 360 / values.length;
-  const angleOffset = 30;
   // Calculate average value and percent
   const avg = values.reduce((a, b) => a + b, 0) / values.length;
   const avgPercent = Math.round((avg / max) * 100);
@@ -71,15 +69,14 @@ export default function ResponsiveRadarChart({ values }: { values: number[] }) {
           radius={radius}
           barWidth={barWidth}
           gap={gap}
-          sectorAngle={angleStep}
+          sectors={SECTORS}
           useUniformSectorColor={true}
         />
 
         {/* Guidelines */}
         <GuideLinesLayer
-          count={values.length}
+          sectors={SECTORS}
           center={center}
-          angleStep={angleStep}
           innerRadius={guidelineInner}
           outerRadius={guidelineOuter}
         />

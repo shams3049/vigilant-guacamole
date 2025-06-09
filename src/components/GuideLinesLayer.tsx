@@ -1,9 +1,8 @@
 import React from 'react';
 
 interface GuideLinesLayerProps {
-  count: number;
+  sectors: { label: string; icon: string; angle: number }[];
   center: number;
-  angleStep: number;
   innerRadius: number;
   outerRadius: number;
 }
@@ -15,14 +14,12 @@ function polarToCartesian(cx: number, cy: number, r: number, angleDeg: number) {
 }
 
 export default function GuideLinesLayer({
-  count, center, angleStep, innerRadius, outerRadius
+  sectors, center, innerRadius, outerRadius
 }: GuideLinesLayerProps) {
   return (
     <g>
-      {Array.from({ length: count }).map((_, i) => {
-        // Calculate angle for each guideline
-        const angle = i * angleStep;
-        // Calculate start and end points for the guideline
+      {sectors.map((s, i) => {
+        const angle = s.angle;
         const p1 = polarToCartesian(center, center, innerRadius, angle);
         const p2 = polarToCartesian(center, center, outerRadius, angle);
         return (

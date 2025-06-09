@@ -30,8 +30,7 @@ export default function RadarLayer({
   radius,
   barWidth,
   gap,
-  sectorAngle,
-  angleOffset = 0,
+  sectors,
   useUniformSectorColor = false,
 }: {
   values: number[];
@@ -40,15 +39,14 @@ export default function RadarLayer({
   radius: number;
   barWidth: number;
   gap: number;
-  sectorAngle: number;
-  angleOffset?: number;
+  sectors: { label: string; icon: string; angle: number }[];
   useUniformSectorColor?: boolean;
 }) {
   return (
     <g>
       {values.map((strength, sectorIndex) => {
-        // Calculate the base angle for this sector
-        const baseAngle = -90 + angleOffset + sectorIndex * sectorAngle;
+        // Use the explicit angle from sectors array
+        const baseAngle = sectors[sectorIndex].angle;
         // Pick color for the sector
         const sectorColor = COLORS[Math.max(0, Math.min(strength - 1, COLORS.length - 1))];
 
@@ -59,9 +57,9 @@ export default function RadarLayer({
           const perimeterGap = (r / 100) * 1.6;
           const effectiveGap = Math.max(4, perimeterGap);
           // Calculate arc angle for each bar
-          const arcAngle = sectorAngle - effectiveGap;
-          const startAngle = baseAngle + effectiveGap / 2;
-          const endAngle = startAngle + arcAngle;
+          const arcAngle = 60 - Math.max(4, (radius + barIndex * (barWidth + gap)) / 100 * 1.6); // 60deg sector
+          const startAngle = baseAngle - arcAngle / 2;
+          const endAngle = baseAngle + arcAngle / 2;
           // Determine if this bar is active (filled)
           const active = barIndex + 1 <= strength;
           // Choose color for active/inactive bar
