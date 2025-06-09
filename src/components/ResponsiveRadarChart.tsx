@@ -33,7 +33,7 @@ export default function ResponsiveRadarChart({ values }: { values: number[] }) {
   // Calculate chart geometry
   const center = size / 2;
   const max = 9;
-  const radius = size * 0.095;
+  const radius = size * 0.095; // restore original value
   const barWidth = size * 0.021;
   const gap = size * 0.007;
   const iconRadius = size * 0.48;

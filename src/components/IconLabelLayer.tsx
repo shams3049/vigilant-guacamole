@@ -28,8 +28,8 @@ export default function IconLabelLayer({
         // Use the explicit angle from the sector
         const angle = s.angle;
         const pos = polarToCartesian(center, center, radius, angle);
-        const boxWidth = iconSize * 1.6;
-        const boxHeight = iconSize * 2.1;
+        const boxWidth = iconSize * 2.8;
+        const boxHeight = iconSize * 2.7;
 
         return (
           <foreignObject
@@ -48,11 +48,11 @@ export default function IconLabelLayer({
               justifyContent: 'flex-start',
               width: '100%',
               height: '100%',
-              fontSize: fontSize * 0.7,
+              fontSize: fontSize * 0.45, // slightly smaller font for better fit
               textAlign: 'center',
               lineHeight: 1.1,
               color: '#000',
-              padding: 1,
+              padding: '10px 16px', // more vertical and horizontal padding
               boxSizing: 'border-box',
             }}>
               <img src={s.icon} alt={s.label} style={{ width: iconSize, height: iconSize }} />
@@ -61,6 +61,7 @@ export default function IconLabelLayer({
                 overflowWrap: 'break-word',
                 wordBreak: 'break-word',
                 width: '100%',
+                whiteSpace: 'normal', // allow wrapping
               }}>{s.label}</div>
             </div>
           </foreignObject>

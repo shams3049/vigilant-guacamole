@@ -20,8 +20,9 @@ export default function GuideLinesLayer({
     <g>
       {sectors.map((s, i) => {
         const angle = s.angle;
-        const p1 = polarToCartesian(center, center, innerRadius, angle);
-        const p2 = polarToCartesian(center, center, outerRadius, angle);
+        // Line starts just outside the last bar and extends inward
+        const p1 = polarToCartesian(center, center, innerRadius + 10, angle);
+        const p2 = polarToCartesian(center, center, outerRadius - 10, angle);
         return (
           <line
             key={`guide-${i}`}
@@ -29,8 +30,8 @@ export default function GuideLinesLayer({
             y1={p1.y}
             x2={p2.x}
             y2={p2.y}
-            stroke="#ccc"
-            strokeWidth={1}
+            stroke="#000"
+            strokeWidth={2}
           />
         );
       })}

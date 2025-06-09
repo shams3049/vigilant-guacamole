@@ -42,31 +42,27 @@ export default function RadarLayer({
   sectors: { label: string; icon: string; angle: number }[];
   useUniformSectorColor?: boolean;
 }) {
+  const totalSectors = sectors.length;
+  const sectorArcAngle = 60; // 360 / 6
+  const sectorGap = 6; // degrees of gap between sectors
   return (
     <g>
       {values.map((strength, sectorIndex) => {
-        // Use the explicit angle from sectors array
         const baseAngle = sectors[sectorIndex].angle;
-        // Pick color for the sector
-        const sectorColor = COLORS[Math.max(0, Math.min(strength - 1, COLORS.length - 1))];
-
         return Array.from({ length: max }, (_, barIndex) => {
-          // Calculate radius for each bar
           const r = radius + barIndex * (barWidth + gap);
-          // Calculate gap between bars based on radius
-          const perimeterGap = (r / 100) * 1.6;
-          const effectiveGap = Math.max(4, perimeterGap);
-          // Calculate arc angle for each bar
-          const arcAngle = 60 - Math.max(4, (radius + barIndex * (barWidth + gap)) / 100 * 1.6); // 60deg sector
+          // Dynamically reduce the sector gap for outer bars
+          const minSectorGap = 2; // minimum gap in degrees for outermost bar
+          const maxSectorGap = 6; // maximum gap in degrees for innermost bar
+          const sectorGap = maxSectorGap - ((maxSectorGap - minSectorGap) * barIndex) / (max - 1);
+          const arcAngle = sectorArcAngle - sectorGap;
           const startAngle = baseAngle - arcAngle / 2;
           const endAngle = baseAngle + arcAngle / 2;
-          // Determine if this bar is active (filled)
           const active = barIndex + 1 <= strength;
-          // Choose color for active/inactive bar
+          const sectorColor = COLORS[Math.max(0, Math.min(strength - 1, COLORS.length - 1))];
           const color = active
             ? (useUniformSectorColor ? sectorColor : COLORS[Math.min(barIndex, COLORS.length - 1)])
             : INACTIVE_COLOR;
-
           return (
             <path
               key={`${sectorIndex}-${barIndex}`}
