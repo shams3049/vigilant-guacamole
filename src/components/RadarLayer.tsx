@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
 // Convert polar coordinates to cartesian coordinates for SVG rendering
 function polarToCartesian(cx: number, cy: number, r: number, angleInDegrees: number) {
@@ -42,6 +42,25 @@ export default function RadarLayer({
   sectors: { label: string; icon: string; angle: number }[];
   useUniformSectorColor?: boolean;
 }) {
+  // Animation state: track which bars are visible (2D array)
+  const [visible, setVisible] = useState(
+    Array(values.length).fill(null).map(() => Array(max).fill(false))
+  );
+
+  useEffect(() => {
+    values.forEach((strength, sectorIndex) => {
+      for (let barIndex = 0; barIndex < max; barIndex++) {
+        setTimeout(() => {
+          setVisible(prev => {
+            const next = prev.map(arr => [...arr]);
+            next[sectorIndex][barIndex] = true;
+            return next;
+          });
+        }, (sectorIndex * max + barIndex) * 60 + 200); // Stagger, start after guidelines
+      }
+    });
+  }, [values.length, max]);
+
   const totalSectors = sectors.length;
   const sectorArcAngle = 60; // Each sector covers 60 degrees (360/6)
   // Render radar bars for each sector and value
@@ -71,6 +90,13 @@ export default function RadarLayer({
               strokeWidth={barWidth}
               fill="none"
               strokeLinecap="butt"
+              style={{
+                opacity: visible[sectorIndex][barIndex] ? 1 : 0,
+                transform: visible[sectorIndex][barIndex] ? 'scale(1)' : 'scale(0.7)',
+                transformOrigin: `${center}px ${center}px`,
+                transition: 'opacity 0.4s, transform 0.4s cubic-bezier(0.4,2,0.6,1)',
+                transitionDelay: `${(sectorIndex * max + barIndex) * 0.06 + 0.2}s`,
+              }}
             />
           );
         });

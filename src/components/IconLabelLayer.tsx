@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
 // Convert polar coordinates to cartesian for SVG placement
 function polarToCartesian(cx: number, cy: number, r: number, angleInDegrees: number) {
@@ -22,6 +22,20 @@ export default function IconLabelLayer({
   iconSize: number;
   fontSize: number;
 }) {
+  // Animation state: which section is currently animating
+  const [activeSection, setActiveSection] = useState(-1);
+
+  useEffect(() => {
+    let i = 0;
+    setActiveSection(-1);
+    const interval = setInterval(() => {
+      setActiveSection(i);
+      i++;
+      if (i >= sectors.length) clearInterval(interval);
+    }, 350); // 350ms per section
+    return () => clearInterval(interval);
+  }, [sectors.length]);
+
   return (
     <g>
       {sectors.map((s, i) => {
@@ -39,6 +53,11 @@ export default function IconLabelLayer({
             y={pos.y - boxHeight / 2}
             width={boxWidth}
             height={boxHeight}
+            style={{
+              opacity: i <= activeSection ? 1 : 0,
+              transform: i <= activeSection ? 'scale(1)' : 'scale(0.7)',
+              transition: 'opacity 0.4s, transform 0.4s cubic-bezier(0.4,2,0.6,1)',
+            }}
           >
             {/* Render icon and label in a vertical flex layout */}
             <div style={{
