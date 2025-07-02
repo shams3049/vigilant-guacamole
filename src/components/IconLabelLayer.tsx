@@ -42,10 +42,10 @@ export default function IconLabelLayer({
         // Place each icon and label at the correct angle and distance
         const angle = s.angle;
         const pos = polarToCartesian(center, center, radius, angle);
-        const boxWidth = iconSize * 2.8;
-        const boxHeight = iconSize * 2.7;
-        // Offset for first sector to prevent label cutoff
-        const xOffset = i === 0 ? boxWidth * 0.18 : 0;
+        const boxWidth = iconSize * 2.5;
+        const boxHeight = iconSize * 2.4;
+        // Slight offset to keep first label visible
+        const xOffset = i === 0 ? boxWidth * 0.1 : 0;
         return (
           <foreignObject
             key={i}
@@ -65,14 +65,14 @@ export default function IconLabelLayer({
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
-              justifyContent: 'flex-start',
+              justifyContent: 'center',
               width: '100%',
               height: '100%',
               fontSize: fontSize * 0.45,
               textAlign: 'center',
               lineHeight: 1.1,
               color: '#000',
-              padding: '10px 16px',
+              padding: '6px 12px',
               boxSizing: 'border-box',
             }}>
               <img src={s.icon} alt={s.label} style={{ width: iconSize, height: iconSize }} />
