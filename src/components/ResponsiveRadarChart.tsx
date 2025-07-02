@@ -36,7 +36,8 @@ export default function ResponsiveRadarChart({ values }: { values: number[] }) {
   const max = 9;
   const radius = size * 0.095;
   const barWidth = size * 0.021;
-  const gap = size * 0.007;
+  // Reduce the gap between bars for a tighter look
+  const gap = size * 0.004;
   const iconRadius = size * 0.48;
   const guidelineInner = radius + max * (barWidth + gap);
   const guidelineOuter = iconRadius - 12;

@@ -59,10 +59,8 @@ export default function RadarLayer({
         const baseAngle = sectors[sectorIndex].angle;
         return Array.from({ length: max }, (_, barIndex) => {
           const r = radius + barIndex * (barWidth + gap);
-          // Dynamically adjust the sector gap for each bar
-          const minSectorGap = 2; // Minimum gap for outermost bar
-          const maxSectorGap = 6; // Maximum gap for innermost bar
-          const sectorGap = maxSectorGap - ((maxSectorGap - minSectorGap) * barIndex) / (max - 1);
+          // Use a uniform gap between sectors so bars stay aligned
+          const sectorGap = 6; // degrees of empty space between each sector
           const arcAngle = sectorArcAngle - sectorGap;
           const startAngle = baseAngle - arcAngle / 2;
           const endAngle = baseAngle + arcAngle / 2;
@@ -76,7 +74,8 @@ export default function RadarLayer({
               stroke={color}
               strokeWidth={barWidth}
               fill="none"
-              strokeLinecap="butt"
+              // Rounded line caps for softer bar edges
+              strokeLinecap="round"
               style={{
                 opacity: visible[sectorIndex][barIndex] ? 1 : 0,
                 transform: visible[sectorIndex][barIndex] ? 'scale(1)' : 'scale(0.7)',
