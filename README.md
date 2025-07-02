@@ -9,6 +9,16 @@ A modern, responsive radar chart React component for visualizing multi-dimension
 - TypeScript support
 - Tailwind CSS styling
 
+## Usage
+The chart reads the values for each wellness category from query parameters in
+the page URL. Each parameter accepts a number from `0` to `9`. For example:
+
+```
+http://localhost:5173/?bewegung=3&ernaehrung_genuss=5&stress_erholung=4&geist_emotion=6&lebenssinn_qualitaet=2&umwelt_soziales=8
+```
+
+If a value is missing or invalid, it defaults to `2`.
+
 ## Project Structure
 ```
 radarChartStaticLoading/
@@ -30,6 +40,7 @@ radarChartStaticLoading/
     ├── App.tsx
     ├── index.css
     ├── index.tsx
+    ├── utils.ts
     └── components/
         ├── GuideLinesLayer.tsx
         ├── IconLabelLayer.tsx

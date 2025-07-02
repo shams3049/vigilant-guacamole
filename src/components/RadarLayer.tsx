@@ -1,21 +1,5 @@
 import React, { useEffect, useState } from 'react';
-
-// Convert polar coordinates to cartesian coordinates for SVG rendering
-function polarToCartesian(cx: number, cy: number, r: number, angleInDegrees: number) {
-  const angleInRadians = ((angleInDegrees - 90) * Math.PI) / 180;
-  return {
-    x: cx + r * Math.cos(angleInRadians),
-    y: cy + r * Math.sin(angleInRadians),
-  };
-}
-
-// Generate an SVG arc path for a circular segment
-function describeArc(cx: number, cy: number, r: number, startAngle: number, endAngle: number) {
-  const start = polarToCartesian(cx, cy, r, endAngle);
-  const end = polarToCartesian(cx, cy, r, startAngle);
-  const largeArcFlag = endAngle - startAngle <= 180 ? "0" : "1";
-  return `M ${start.x} ${start.y} A ${r} ${r} 0 ${largeArcFlag} 0 ${end.x} ${end.y}`;
-}
+import { polarToCartesian, describeArc, type Sector } from '../utils';
 
 const FULL_COLOR = "#3D5241";       // >= 50%
 const MEDIUM_COLOR = "#7C987C";     // < 50%
@@ -46,7 +30,7 @@ export default function RadarLayer({
   radius: number;
   barWidth: number;
   gap: number;
-  sectors: { label: string; icon: string; angle: number }[];
+  sectors: Sector[];
 }) {
   // Animation state: track which bars are visible (2D array)
   const [visible, setVisible] = useState(
