@@ -59,8 +59,9 @@ export default function RadarLayer({
         const baseAngle = sectors[sectorIndex].angle;
         return Array.from({ length: max }, (_, barIndex) => {
           const r = radius + barIndex * (barWidth + gap);
-          // Use a uniform gap between sectors so bars stay aligned
-          const sectorGap = 6; // degrees of empty space between each sector
+          // Keep the actual gap distance between sectors constant across rings
+          const sectorGapPx = barWidth; // physical gap in pixels
+          const sectorGap = (sectorGapPx / r) * (180 / Math.PI); // convert to degrees
           const arcAngle = sectorArcAngle - sectorGap;
           const startAngle = baseAngle - arcAngle / 2;
           const endAngle = baseAngle + arcAngle / 2;
