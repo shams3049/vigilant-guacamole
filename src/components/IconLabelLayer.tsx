@@ -1,13 +1,5 @@
 import React, { useEffect, useState } from 'react';
-
-// Convert polar coordinates to cartesian for SVG placement
-function polarToCartesian(cx: number, cy: number, r: number, angleInDegrees: number) {
-  const angleInRadians = ((angleInDegrees - 90) * Math.PI) / 180;
-  return {
-    x: cx + r * Math.cos(angleInRadians),
-    y: cy + r * Math.sin(angleInRadians),
-  };
-}
+import { polarToCartesian, type Sector } from '../utils';
 
 export default function IconLabelLayer({
   sectors,
@@ -16,7 +8,7 @@ export default function IconLabelLayer({
   iconSize,
   fontSize,
 }: {
-  sectors: { label: string; icon: string; angle: number }[];
+  sectors: Sector[];
   center: number;
   radius: number;
   iconSize: number;

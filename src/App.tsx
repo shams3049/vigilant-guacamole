@@ -10,7 +10,8 @@ const SECTION_KEYS = [
   "umwelt_soziales",
 ];
 
-// Parse strengths from URL parameters, defaulting to 2 if not present or invalid
+// Parse values for each category from the query string. If a value is missing
+// or invalid it falls back to `2` so the chart always has reasonable data.
 function parseStrengths(): number[] {
   const params = new URLSearchParams(window.location.search);
   return SECTION_KEYS.map(key => {

@@ -2,9 +2,10 @@ import React, { useRef, useState, useLayoutEffect } from 'react';
 import RadarLayer from './RadarLayer';
 import GuideLinesLayer from './GuideLinesLayer';
 import IconLabelLayer from './IconLabelLayer';
+import type { Sector } from '../utils';
 
 // Define the radar chart sectors with their labels, icons, and angles
-const SECTORS = [
+const SECTORS: Sector[] = [
   { label: 'Bewegung', icon: '/assets/bewegung.svg', angle: -90 },
   { label: 'Ernährung & Genuss', icon: '/assets/ernaehrung_genuss.svg', angle: -30 },
   { label: 'Stress & Erholung', icon: '/assets/stress_erholung.svg', angle: 30 },

@@ -1,17 +1,12 @@
 import React, { useEffect, useState } from 'react';
+import { polarToCartesian, type Sector } from '../utils';
 
 interface GuideLinesLayerProps {
-  sectors: { label: string; icon: string; angle: number }[];
+  sectors: Sector[];
   center: number;
   innerRadius: number;
   outerRadius: number;
   iconSize: number; // NEW: pass iconSize for guideline adjustment
-}
-
-// Convert polar coordinates to cartesian for SVG line endpoints
-function polarToCartesian(cx: number, cy: number, r: number, angleDeg: number) {
-  const rad = ((angleDeg - 90) * Math.PI) / 180;
-  return { x: cx + r * Math.cos(rad), y: cy + r * Math.sin(rad) };
 }
 
 export default function GuideLinesLayer({
