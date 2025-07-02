@@ -59,9 +59,12 @@ export default function RadarLayer({
         const baseAngle = sectors[sectorIndex].angle;
         return Array.from({ length: max }, (_, barIndex) => {
           const r = radius + barIndex * (barWidth + gap);
-          // Keep the actual gap distance between sectors constant across rings
+          // Keep the gap distance consistent, then add extra space for inner rings
           const sectorGapPx = barWidth; // physical gap in pixels
-          const sectorGap = (sectorGapPx / r) * (180 / Math.PI); // convert to degrees
+          const baseGap = (sectorGapPx / r) * (180 / Math.PI); // convert to degrees
+          // Extra 6° for innermost ring, linearly decreasing to 0° for the outermost
+          const extraGap = 6 * (1 - barIndex / (max - 1));
+          const sectorGap = baseGap + extraGap;
           const arcAngle = sectorArcAngle - sectorGap;
           const startAngle = baseAngle - arcAngle / 2;
           const endAngle = baseAngle + arcAngle / 2;
