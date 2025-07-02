@@ -75,7 +75,23 @@ export default function IconLabelLayer({
               padding: '6px 12px',
               boxSizing: 'border-box',
             }}>
-              <img src={s.icon} alt={s.label} style={{ width: iconSize, height: iconSize }} />
+              <div
+                style={{
+                  backgroundColor: '#F6E2CA',
+                  borderRadius: '50%',
+                  width: iconSize * 1.4,
+                  height: iconSize * 1.4,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                <img
+                  src={s.icon}
+                  alt={s.label}
+                  style={{ width: iconSize, height: iconSize }}
+                />
+              </div>
               <div style={{
                 marginTop: 2,
                 overflowWrap: 'break-word',
