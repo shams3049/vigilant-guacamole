@@ -76,7 +76,8 @@ export default function RadarLayer({
               stroke={color}
               strokeWidth={barWidth}
               fill="none"
-              strokeLinecap="butt"
+              // Rounded line caps for softer bar edges
+              strokeLinecap="round"
               style={{
                 opacity: visible[sectorIndex][barIndex] ? 1 : 0,
                 transform: visible[sectorIndex][barIndex] ? 'scale(1)' : 'scale(0.7)',
