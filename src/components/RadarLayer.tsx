@@ -17,11 +17,19 @@ function describeArc(cx: number, cy: number, r: number, startAngle: number, endA
   return `M ${start.x} ${start.y} A ${r} ${r} 0 ${largeArcFlag} 0 ${end.x} ${end.y}`;
 }
 
-const COLORS = [
-  "#FF0000", "#FF4000", "#FF8000", "#FFBF00",
-  "#BFFF00", "#80FF00", "#40FF00", "#20C000", "#006400"
-];
+const FULL_COLOR = "#3D5241";       // >= 50%
+const MEDIUM_COLOR = "#7C987C";     // < 50%
+const LOW_COLOR = "#FFAD4C";        // < 30%
+const LOWEST_COLOR = "#FF8B7B";     // < 20%
 const INACTIVE_COLOR = "#E0E0E0";
+
+function getStrengthColor(strength: number, max: number): string {
+  const percent = strength / max;
+  if (percent >= 0.5) return FULL_COLOR;
+  if (percent >= 0.3) return MEDIUM_COLOR;
+  if (percent >= 0.2) return LOW_COLOR;
+  return LOWEST_COLOR;
+}
 
 export default function RadarLayer({
   values,
@@ -31,7 +39,6 @@ export default function RadarLayer({
   barWidth,
   gap,
   sectors,
-  useUniformSectorColor = false,
 }: {
   values: number[];
   center: number;
@@ -40,7 +47,6 @@ export default function RadarLayer({
   barWidth: number;
   gap: number;
   sectors: { label: string; icon: string; angle: number }[];
-  useUniformSectorColor?: boolean;
 }) {
   // Animation state: track which bars are visible (2D array)
   const [visible, setVisible] = useState(
@@ -61,7 +67,6 @@ export default function RadarLayer({
     });
   }, [values.length, max]);
 
-  const totalSectors = sectors.length;
   const sectorArcAngle = 60; // Each sector covers 60 degrees (360/6)
   // Render radar bars for each sector and value
   return (
@@ -78,10 +83,8 @@ export default function RadarLayer({
           const startAngle = baseAngle - arcAngle / 2;
           const endAngle = baseAngle + arcAngle / 2;
           const active = barIndex + 1 <= strength;
-          const sectorColor = COLORS[Math.max(0, Math.min(strength - 1, COLORS.length - 1))];
-          const color = active
-            ? (useUniformSectorColor ? sectorColor : COLORS[Math.min(barIndex, COLORS.length - 1)])
-            : INACTIVE_COLOR;
+          const sectorColor = getStrengthColor(strength, max);
+          const color = active ? sectorColor : INACTIVE_COLOR;
           return (
             <path
               key={`${sectorIndex}-${barIndex}`}

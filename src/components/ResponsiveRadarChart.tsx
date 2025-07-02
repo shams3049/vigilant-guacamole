@@ -47,15 +47,15 @@ export default function ResponsiveRadarChart({ values }: { values: number[] }) {
 
   return (
     <div ref={containerRef} className="w-full h-full flex items-center justify-center">
-      <svg width={size} height={size}>
+      <svg width="100%" height="100%" viewBox={`0 0 ${size} ${size}`} preserveAspectRatio="xMidYMid meet">
         {/* Center circle and average percent display */}
-        <circle cx={center} cy={center} r={size * 0.07} fill="#ccc" />
+        <circle cx={center} cy={center} r={size * 0.07} fill="#F6E2CA" />
         <text
           x={center}
           y={center}
           textAnchor="middle"
           dominantBaseline="middle"
-          fontSize={size * 0.058}
+          fontSize={size * 0.058 * 0.85}
           fontWeight="bold"
         >
           {avgPercent}%
@@ -70,7 +70,6 @@ export default function ResponsiveRadarChart({ values }: { values: number[] }) {
           barWidth={barWidth}
           gap={gap}
           sectors={SECTORS}
-          useUniformSectorColor={true}
         />
 
         {/* Render guidelines between sectors */}
