@@ -46,7 +46,7 @@ export default function RadarLayer({
             next[sectorIndex][barIndex] = true;
             return next;
           });
-        }, (sectorIndex * max + barIndex) * 60 + 200); // Stagger, start after guidelines
+        }, barIndex * 20 + sectorIndex * 10 + 100); // Much faster: 20ms per bar, 10ms sector offset, start after 100ms
       }
     });
   }, [values.length, max]);
@@ -81,8 +81,8 @@ export default function RadarLayer({
                 opacity: visible[sectorIndex][barIndex] ? 1 : 0,
                 transform: visible[sectorIndex][barIndex] ? 'scale(1)' : 'scale(0.7)',
                 transformOrigin: `${center}px ${center}px`,
-                transition: 'opacity 0.4s, transform 0.4s cubic-bezier(0.4,2,0.6,1)',
-                transitionDelay: `${(sectorIndex * max + barIndex) * 0.06 + 0.2}s`,
+                transition: 'opacity 0.3s, transform 0.3s cubic-bezier(0.4,2,0.6,1)',
+                transitionDelay: `${barIndex * 20 + sectorIndex * 10 + 100}ms`,
               }}
             />
           );

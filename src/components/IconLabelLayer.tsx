@@ -18,14 +18,13 @@ export default function IconLabelLayer({
   const [activeSection, setActiveSection] = useState(-1);
 
   useEffect(() => {
-    let i = 0;
+    // Start all sections animating in parallel with slight stagger
     setActiveSection(-1);
-    const interval = setInterval(() => {
-      setActiveSection(i);
-      i++;
-      if (i >= sectors.length) clearInterval(interval);
-    }, 350); // 350ms per section
-    return () => clearInterval(interval);
+    const timeout = setTimeout(() => {
+      setActiveSection(sectors.length - 1); // Show all sections at once
+    }, 100); // Short delay before showing all
+    
+    return () => clearTimeout(timeout);
   }, [sectors.length]);
 
   return (
@@ -50,6 +49,7 @@ export default function IconLabelLayer({
               opacity: i <= activeSection ? 1 : 0,
               transform: i <= activeSection ? 'scale(1)' : 'scale(0.7)',
               transition: 'opacity 0.4s, transform 0.4s cubic-bezier(0.4,2,0.6,1)',
+              transitionDelay: `${i * 50}ms`, // Small stagger for each icon (50ms apart)
             }}
           >
             {/* Render icon and label in a vertical flex layout */}

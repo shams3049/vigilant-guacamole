@@ -1,20 +1,22 @@
-# ResponsiveRadarChart
+# Radar Chart Widget
 
-A modern, responsive radar chart React component for visualizing multi-dimensional wellness data. Each sector represents a wellness category with a custom icon and label. The chart is fully responsive and can be easily integrated into any React project.
+A responsive, animated radar chart widget built with React, TypeScript, and Vite. Perfect for displaying wellness or performance metrics across multiple categories.
 
-## Features
-- Responsive SVG radar chart
-- Customizable sectors with icons and labels
-- Animated and interactive
-- TypeScript support
-- Tailwind CSS styling
+## 🚀 Features
 
-## Usage
-The chart reads the values for each wellness category from query parameters in
-the page URL. Each parameter accepts a number from `0` to `9`. For example:
+- **Responsive Design**: Adapts seamlessly to all screen sizes (320px to 1400px+)
+- **Smooth Animations**: Fast, parallel animations that complete in under 1 second
+- **Interactive**: Clickable pointer with wobble animation
+- **Accessible**: Full keyboard navigation and screen reader support
+- **Performance Optimized**: Hardware-accelerated animations and efficient rendering
+- **URL-Driven**: Chart values controlled via URL parameters
+
+## 📊 Usage
+
+The chart reads the values for each wellness category from query parameters in the page URL. Each parameter accepts a number from `0` to `9`. For example:
 
 ```
-http://localhost:5173/?bewegung=3&ernaehrung_genuss=5&stress_erholung=4&geist_emotion=6&lebenssinn_qualitaet=2&umwelt_soziales=8
+http://localhost:5173/?bewegung=7&ernaehrung_genuss=5&stress_erholung=3&geist_emotion=8&lebenssinn_qualitaet=6&umwelt_soziales=4
 ```
 
 If a value is missing or invalid, it defaults to `2`.

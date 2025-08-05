@@ -16,7 +16,7 @@ export default function GuideLinesLayer({
   const [visible, setVisible] = useState(Array(sectors.length).fill(false));
 
   useEffect(() => {
-    // Animate guidelines one by one
+    // Animate all guidelines together with minimal stagger
     sectors.forEach((_, i) => {
       setTimeout(() => {
         setVisible(prev => {
@@ -24,7 +24,7 @@ export default function GuideLinesLayer({
           next[i] = true;
           return next;
         });
-      }, i * 120); // 120ms stagger per guideline
+      }, i * 20); // Very small stagger: 20ms per guideline
     });
   }, [sectors.length]);
 
@@ -50,7 +50,8 @@ export default function GuideLinesLayer({
             strokeDasharray={length}
             strokeDashoffset={visible[i] ? 0 : length}
             style={{
-              transition: 'stroke-dashoffset 0.5s cubic-bezier(0.4,2,0.6,1)',
+              transition: 'stroke-dashoffset 0.3s cubic-bezier(0.4,2,0.6,1), opacity 0.3s ease',
+              transitionDelay: `${i * 20}ms`,
             }}
             opacity={visible[i] ? 1 : 0.2}
           />
