@@ -27,12 +27,17 @@ jobs:
           cache: 'npm'
           
       - name: Install dependencies
-        run: npm ci
+        run: |
+          npm ci
+          npm ls terser || echo "Terser not found in dependencies"
+          
+      - name: Type check
+        run: npm run type-check
         
       - name: Build
-        run: npm run build
-        
-      - name: Setup Pages
+        run: |
+          echo "Building with esbuild minification..."
+          npm run build      - name: Setup Pages
         uses: actions/configure-pages@v4
         
       - name: Upload artifact

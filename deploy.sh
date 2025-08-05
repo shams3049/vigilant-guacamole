@@ -12,6 +12,13 @@ rm -rf dist/
 echo "📦 Installing dependencies..."
 npm ci --silent
 
+# Check if terser is available
+if npm ls terser > /dev/null 2>&1; then
+    echo "✅ Terser is available for minification"
+else
+    echo "⚠️  Terser not found, using esbuild for minification"
+fi
+
 # Type check
 echo "🔍 Running type check..."
 npx tsc --noEmit
@@ -27,6 +34,10 @@ npm run build
 
 if [ $? -ne 0 ]; then
     echo "❌ Build failed. Please check the console output."
+    echo "💡 Common fixes:"
+    echo "   - Run 'npm install terser' if using terser minification"
+    echo "   - Check Vite configuration for compatibility issues"
+    echo "   - Ensure all TypeScript errors are resolved"
     exit 1
 fi
 
@@ -35,6 +46,10 @@ if [ -d "dist" ] && [ "$(ls -A dist)" ]; then
     echo "✅ Build completed successfully!"
     echo "📁 Build output:"
     ls -la dist/
+    
+    # Show build size
+    echo "📊 Build size:"
+    du -sh dist/
     
     # Optional: Start preview server
     echo ""

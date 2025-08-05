@@ -8,12 +8,16 @@ export default defineConfig({
     outDir: 'dist',
     assetsDir: 'assets',
     sourcemap: false, // Disable source maps in production
-    minify: 'terser',
+    minify: 'esbuild', // Use esbuild instead of terser for better compatibility
+    target: 'esnext',
     rollupOptions: {
       output: {
         manualChunks: {
           vendor: ['react', 'react-dom']
-        }
+        },
+        chunkFileNames: 'assets/[name]-[hash].js',
+        entryFileNames: 'assets/[name]-[hash].js',
+        assetFileNames: 'assets/[name]-[hash].[ext]'
       }
     }
   },
