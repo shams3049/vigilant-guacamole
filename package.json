@@ -1,21 +1,10 @@
 {
   "name": "radar-chart-widget",
   "version": "1.0.0",
-  "description": "A responsive, animated radar chart widget for visualizing wellness metrics",
-  "keywords": ["react", "radar-chart", "wellness", "visualization", "responsive", "typescript"],
-  "author": "shams3049",
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/shams3049/vigilant-guacamole.git"
-  },
-  "homepage": "https://shams3049.github.io/vigilant-guacamole",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview",
-    "type-check": "tsc --noEmit",
-    "clean": "rm -rf dist"
+    "preview": "vite preview"
   },
   "dependencies": {
     "react": "^18.2.0",
@@ -28,7 +17,6 @@
     "autoprefixer": "^10.4.0",
     "postcss": "^8.4.0",
     "tailwindcss": "^3.0.0",
-    "terser": "^5.20.0",
     "typescript": "^4.6.0",
     "vite": "^4.0.0"
   }
