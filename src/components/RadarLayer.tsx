@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo, useCallback } from 'react';
 import { polarToCartesian, describeArc, type Sector } from '../utils';
 
 const FULL_COLOR = "#3D5241";       // >= 50%
@@ -37,57 +37,100 @@ export default function RadarLayer({
     Array(values.length).fill(null).map(() => Array(max).fill(false))
   );
 
+  // Memoize animation timing calculation
+  const animationConfig = useMemo(() => {
+    const baseDelay = 200; // Start after guidelines
+    const staggerDelay = 40; // Reduced from 60ms for faster animation
+    const sectorDelay = max * staggerDelay;
+    
+    return { baseDelay, staggerDelay, sectorDelay };
+  }, [max]);
+
+  // Memoize sector configurations
+  const sectorConfigs = useMemo(() => {
+    const sectorArcAngle = 60; // Each sector covers 60 degrees (360/6)
+    
+    return values.map((strength, sectorIndex) => {
+      const baseAngle = sectors[sectorIndex].angle;
+      const sectorColor = getStrengthColor(strength, max);
+      
+      return {
+        strength,
+        baseAngle,
+        sectorColor,
+        bars: Array.from({ length: max }, (_, barIndex) => {
+          const r = radius + barIndex * (barWidth + gap);
+          const sectorGapPx = barWidth * 0.3;
+          const sectorGap = (sectorGapPx / r) * (180 / Math.PI);
+          const arcAngle = sectorArcAngle - sectorGap;
+          const startAngle = baseAngle - arcAngle / 2;
+          const endAngle = baseAngle + arcAngle / 2;
+          const active = barIndex + 1 <= strength;
+          
+          return {
+            r,
+            startAngle,
+            endAngle,
+            active,
+            path: describeArc(center, center, r, startAngle, endAngle),
+            color: active ? sectorColor : INACTIVE_COLOR,
+            animationDelay: (sectorIndex * max + barIndex) * animationConfig.staggerDelay + animationConfig.baseDelay,
+          };
+        }),
+      };
+    });
+  }, [values, sectors, max, radius, barWidth, gap, center, animationConfig]);
+
+  // Optimized animation effect with cleanup
   useEffect(() => {
-    values.forEach((strength, sectorIndex) => {
-      for (let barIndex = 0; barIndex < max; barIndex++) {
-        setTimeout(() => {
+    const timeouts: number[] = [];
+    
+    // Reset visibility
+    setVisible(Array(values.length).fill(null).map(() => Array(max).fill(false)));
+    
+    // Create all animations at once to reduce state updates
+    sectorConfigs.forEach((sectorConfig, sectorIndex) => {
+      sectorConfig.bars.forEach((_, barIndex) => {
+        const timeout = setTimeout(() => {
           setVisible(prev => {
             const next = prev.map(arr => [...arr]);
             next[sectorIndex][barIndex] = true;
             return next;
           });
-        }, barIndex * 20 + sectorIndex * 10 + 100); // Much faster: 20ms per bar, 10ms sector offset, start after 100ms
-      }
+        }, sectorConfig.bars[barIndex].animationDelay);
+        
+        timeouts.push(timeout);
+      });
     });
-  }, [values.length, max]);
 
-  const sectorArcAngle = 60; // Each sector covers 60 degrees (360/6)
-  // Render radar bars for each sector and value
-  return (
-    <g>
-      {values.map((strength, sectorIndex) => {
-        const baseAngle = sectors[sectorIndex].angle;
-        return Array.from({ length: max }, (_, barIndex) => {
-          const r = radius + barIndex * (barWidth + gap);
-          // Uniform gap calculation - consistent spacing between sections
-          const sectorGapPx = barWidth * 0.3; // physical gap in pixels - minimal spacing
-          const sectorGap = (sectorGapPx / r) * (180 / Math.PI); // convert to degrees
-          const arcAngle = sectorArcAngle - sectorGap;
-          const startAngle = baseAngle - arcAngle / 2;
-          const endAngle = baseAngle + arcAngle / 2;
-          const active = barIndex + 1 <= strength;
-          const sectorColor = getStrengthColor(strength, max);
-          const color = active ? sectorColor : INACTIVE_COLOR;
-          return (
-            <path
-              key={`${sectorIndex}-${barIndex}`}
-              d={describeArc(center, center, r, startAngle, endAngle)}
-              stroke={color}
-              strokeWidth={barWidth}
-              fill="none"
-              // Clean square corners for uniform appearance
-              strokeLinecap="butt"
-              style={{
-                opacity: visible[sectorIndex][barIndex] ? 1 : 0,
-                transform: visible[sectorIndex][barIndex] ? 'scale(1)' : 'scale(0.7)',
-                transformOrigin: `${center}px ${center}px`,
-                transition: 'opacity 0.3s, transform 0.3s cubic-bezier(0.4,2,0.6,1)',
-                transitionDelay: `${barIndex * 20 + sectorIndex * 10 + 100}ms`,
-              }}
-            />
-          );
-        });
-      })}
-    </g>
-  );
+    // Cleanup function
+    return () => {
+      timeouts.forEach(timeout => clearTimeout(timeout));
+    };
+  }, [sectorConfigs, values.length, max]);
+
+  // Memoize rendered paths to avoid recalculation
+  const renderedPaths = useMemo(() => {
+    return sectorConfigs.flatMap((sectorConfig, sectorIndex) =>
+      sectorConfig.bars.map((bar, barIndex) => (
+        <path
+          key={`${sectorIndex}-${barIndex}`}
+          d={bar.path}
+          stroke={bar.color}
+          strokeWidth={barWidth}
+          fill="none"
+          strokeLinecap="butt"
+          style={{
+            opacity: visible[sectorIndex]?.[barIndex] ? 1 : 0,
+            transform: visible[sectorIndex]?.[barIndex] ? 'scale(1)' : 'scale(0.7)',
+            transformOrigin: `${center}px ${center}px`,
+            transition: 'opacity 0.3s ease-out, transform 0.3s cubic-bezier(0.4,2,0.6,1)',
+            willChange: visible[sectorIndex]?.[barIndex] ? 'auto' : 'opacity, transform',
+          }}
+        />
+      ))
+    );
+  }, [sectorConfigs, visible, barWidth, center]);
+
+  return <g>{renderedPaths}</g>;
 }

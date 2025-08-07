@@ -1,13 +1,14 @@
 import ResponsiveRadarChart from './components/ResponsiveRadarChart';
 
 // Section keys correspond to URL parameters for each wellness category
+// Arranged clockwise starting from 12 o'clock
 const SECTION_KEYS = [
-  "bewegung",
-  "ernaehrung_genuss",
-  "stress_erholung",
-  "geist_emotion",
-  "lebenssinn_qualitaet",
-  "umwelt_soziales",
+  "koerper_bewegung",      // Körper & Bewegung (12 o'clock)
+  "ernaehrung_genuss",     // Ernährung & Genuss (2 o'clock)
+  "stress_erholung",       // Stress & Erholung (4 o'clock)
+  "geist_emotionen",       // Geist & Emotionen (6 o'clock)
+  "lebenssinn_qualitaet",  // Lebenssinn & -qualität (8 o'clock)
+  "umwelt_soziales",       // Umwelt & Soziales (10 o'clock)
 ];
 
 // Parse values for each category from the query string. If a value is missing

@@ -5,13 +5,14 @@ import IconLabelLayer from './IconLabelLayer';
 import type { Sector } from '../utils';
 
 // Define the radar chart sectors with their labels, icons, and angles
+// Starting from 0° (which becomes 12 o'clock after polarToCartesian offset) and proceeding clockwise in 60° increments
 const SECTORS: Sector[] = [
-  { label: 'Bewegung', icon: '/assets/bewegung.svg', angle: -90 },
-  { label: 'Ernährung & Genuss', icon: '/assets/ernaehrung_genuss.svg', angle: -30 },
-  { label: 'Stress & Erholung', icon: '/assets/stress_erholung.svg', angle: 30 },
-  { label: 'Geist & Emotion', icon: '/assets/geist_emotion.svg', angle: 90 },
-  { label: 'Lebenssinn & -qualität', icon: '/assets/lebenssinn_qualitaet.svg', angle: 150 },
-  { label: 'Umwelt & Soziales', icon: '/assets/umwelt_soziales.svg', angle: 210 },
+  { label: 'Körper & Bewegung', icon: '/assets/bewegung.svg', angle: 0 },     // 12 o'clock (0° - 90° = -90° = 12 o'clock)
+  { label: 'Ernährung & Genuss', icon: '/assets/ernaehrung_genuss.svg', angle: 60 },   // 2 o'clock
+  { label: 'Stress & Erholung', icon: '/assets/stress_erholung.svg', angle: 120 },   // 4 o'clock
+  { label: 'Geist & Emotionen', icon: '/assets/geist_emotion.svg', angle: 180 },     // 6 o'clock
+  { label: 'Lebenssinn & -qualität', icon: '/assets/lebenssinn_qualitaet.svg', angle: 240 }, // 8 o'clock
+  { label: 'Umwelt & Soziales', icon: '/assets/umwelt_soziales.svg', angle: 300 },  // 10 o'clock
 ];
 
 // Debounce utility function for resize events
