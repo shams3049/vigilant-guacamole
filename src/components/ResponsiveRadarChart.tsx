@@ -68,6 +68,7 @@ export default function ResponsiveRadarChart({ values }: { values: number[] }) {
   const [isWobbling, setIsWobbling] = useState(false);
   // Track if component is mounted to prevent memory leaks
   const isMountedRef = useRef(true);
+  const [showLabels, setShowLabels] = useState(false);
 
   // Debounced resize handler to improve performance
   const debouncedResize = useDebounce(() => {
@@ -103,7 +104,11 @@ export default function ResponsiveRadarChart({ values }: { values: number[] }) {
   const calculations = useMemo(() => {
     const center = size / 2;
     const max = 9;
-    const guidelineInner = config.radius + max * (config.barWidth + config.gap);
+
+    // Compute the outer edge radius of the outermost bar
+    const outermostRingCenterRadius = config.radius + (max - 1) * (config.barWidth + config.gap);
+    const guidelineInner = outermostRingCenterRadius + config.barWidth / 2; // touch outer bar edge
+
     const guidelineOuter = config.iconRadius - 12;
     
     // Calculate the average value and its percentage
@@ -145,6 +150,11 @@ export default function ResponsiveRadarChart({ values }: { values: number[] }) {
     };
   }, []);
 
+  // When values change, restart label reveal
+  useLayoutEffect(() => {
+    setShowLabels(false);
+  }, [values]);
+
   return (
     <div ref={containerRef} className="w-full h-full flex items-center justify-center min-h-0">
       <svg 
@@ -154,19 +164,6 @@ export default function ResponsiveRadarChart({ values }: { values: number[] }) {
         preserveAspectRatio="xMidYMid meet"
         style={{ maxHeight: '100vh', maxWidth: '100vw' }}
       >
-        {/* Define gradients for the pointer */}
-        <defs>
-          <linearGradient id="pointerGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor="#FF8A8A" />
-            <stop offset="50%" stopColor="#FF6B6B" />
-            <stop offset="100%" stopColor="#CC5555" />
-          </linearGradient>
-          <linearGradient id="baseGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stopColor="#FF8A8A" />
-            <stop offset="100%" stopColor="#CC5555" />
-          </linearGradient>
-        </defs>
-        
         {/* Center circle with responsive sizing */}
         <circle 
           cx={calculations.center} 
@@ -179,7 +176,6 @@ export default function ResponsiveRadarChart({ values }: { values: number[] }) {
         
         {/* Navigation pointer pointing to the lowest scoring section */}
         <g transform={`translate(${calculations.center}, ${calculations.center})`}>
-          {/* Animated pointer with smooth transition */}
           <g 
             style={{ 
               transformOrigin: '0 0', 
@@ -198,56 +194,33 @@ export default function ResponsiveRadarChart({ values }: { values: number[] }) {
               }
             }}
           >
-            {/* Rotational wobble animation container */}
             <g 
               style={{
                 transformOrigin: '0 0',
                 animation: isWobbling ? 'wobbleRotation 2.5s ease-out' : 'none'
               }}
             >
-              {/* Main pointer body with responsive sizing */}
-              <polygon
-                points={`0,-${config.pointerSize.length} -${config.pointerSize.width},-${config.pointerSize.length * 0.12} -${config.pointerSize.width * 0.45},${config.pointerSize.base} ${config.pointerSize.width * 0.45},${config.pointerSize.base} ${config.pointerSize.width},-${config.pointerSize.length * 0.12}`}
-                fill="url(#pointerGradient)"
-                stroke="#AA4444"
-                strokeWidth="0.5"
-              />
-              
-              {/* Indented base edges for 3D effect */}
-              <polygon
-                points={`-${config.pointerSize.width * 0.45},${config.pointerSize.base} -${config.pointerSize.width * 0.22},${config.pointerSize.base * 1.5} ${config.pointerSize.width * 0.22},${config.pointerSize.base * 1.5} ${config.pointerSize.width * 0.45},${config.pointerSize.base}`}
-                fill="#AA4444"
-                stroke="#884444"
-                strokeWidth="0.5"
-              />
-              
-              {/* Center pivot circle with gradient */}
-              <circle 
-                cx="0" 
-                cy="0" 
-                r={Math.max(size * 0.013, 4)} 
-                fill="url(#baseGradient)" 
-                stroke="#AA4444" 
-                strokeWidth="0.5" 
-              />
-              
-              {/* Highlight on the pointer tip */}
-              <polygon
-                points={`0,-${config.pointerSize.length} -${config.pointerSize.width * 0.33},-${config.pointerSize.length * 0.62} ${config.pointerSize.width * 0.33},-${config.pointerSize.length * 0.62}`}
-                fill="#FFAAAA"
-                opacity="0.8"
-              />
-              
-              {/* Subtle pulsing animation with responsive sizing */}
-              <circle cx="0" cy="0" r={Math.max(size * 0.012, 4)} fill="#FF6B6B" opacity="0.3">
-                <animate 
-                  attributeName="r" 
-                  values={`${Math.max(size * 0.012, 4)};${Math.max(size * 0.016, 6)};${Math.max(size * 0.012, 4)}`} 
-                  dur="2s" 
-                  repeatCount="indefinite" 
-                />
-                <animate attributeName="opacity" values="0.3;0.1;0.3" dur="2s" repeatCount="indefinite" />
-              </circle>
+              {(() => {
+                // Size at 1.5x, image centered around the origin so its vertical center aligns with the chart center.
+                const baseHeight = Math.max(config.centerRadius * 1.65, 44);
+                const height = baseHeight * 1.5; // 1.5x
+                const width = (32 / 48) * height; // maintain aspect ratio from viewBox (32x48)
+                // Fine-tune offsets if needed.
+                const offsetX = 0;
+                const offsetY = 0;
+                const x = -width / 2 + offsetX;
+                const y = -height / 2 + offsetY; // vertical center at origin
+                return (
+                  <image
+                    href="/assets/naviationicon.svg"
+                    x={x}
+                    y={y}
+                    width={width}
+                    height={height}
+                    preserveAspectRatio="xMidYMid meet"
+                  />
+                );
+              })()}
             </g>
           </g>
         </g>
@@ -261,6 +234,10 @@ export default function ResponsiveRadarChart({ values }: { values: number[] }) {
           barWidth={config.barWidth}
           gap={config.gap}
           sectors={SECTORS}
+          onProgress={(visibleR) => {
+            if (visibleR >= calculations.max) setShowLabels(true);
+          }}
+          onBarsComplete={() => setShowLabels(true)}
         />
 
         {/* Render guidelines between sectors */}
@@ -270,6 +247,10 @@ export default function ResponsiveRadarChart({ values }: { values: number[] }) {
           innerRadius={calculations.guidelineInner}
           outerRadius={calculations.guidelineOuter}
           iconSize={config.iconSize}
+          fontSize={config.fontSize}
+          labelRadius={config.iconRadius}
+          avoidRadius={calculations.guidelineInner}
+          safetyGap={12}
         />
 
         {/* Render icons and labels for each sector */}
@@ -279,6 +260,9 @@ export default function ResponsiveRadarChart({ values }: { values: number[] }) {
           radius={config.iconRadius}
           iconSize={config.iconSize}
           fontSize={config.fontSize}
+          avoidRadius={calculations.guidelineInner}
+          safetyGap={12}
+          showLabels={showLabels}
         />
       </svg>
     </div>

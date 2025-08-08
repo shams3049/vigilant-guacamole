@@ -23,6 +23,8 @@ export default function RadarLayer({
   barWidth,
   gap,
   sectors,
+  onBarsComplete,
+  onProgress,
 }: {
   values: number[];
   center: number;
@@ -31,22 +33,13 @@ export default function RadarLayer({
   barWidth: number;
   gap: number;
   sectors: Sector[];
+  onBarsComplete?: () => void; // New: callback to notify when outward animation completes
+  onProgress?: (visibleR: number) => void;
 }) {
-  // Animation state: track which bars are visible (2D array)
-  const [visible, setVisible] = useState(
-    Array(values.length).fill(null).map(() => Array(max).fill(false))
-  );
+  // Visible bars count (radius index) shown so far, same for all sectors
+  const [visibleR, setVisibleR] = useState(0);
 
-  // Memoize animation timing calculation
-  const animationConfig = useMemo(() => {
-    const baseDelay = 200; // Start after guidelines
-    const staggerDelay = 40; // Reduced from 60ms for faster animation
-    const sectorDelay = max * staggerDelay;
-    
-    return { baseDelay, staggerDelay, sectorDelay };
-  }, [max]);
-
-  // Memoize sector configurations
+  // Memoize sector configurations (angles/colors/paths)
   const sectorConfigs = useMemo(() => {
     const sectorArcAngle = 60; // Each sector covers 60 degrees (360/6)
     
@@ -74,63 +67,62 @@ export default function RadarLayer({
             active,
             path: describeArc(center, center, r, startAngle, endAngle),
             color: active ? sectorColor : INACTIVE_COLOR,
-            animationDelay: (sectorIndex * max + barIndex) * animationConfig.staggerDelay + animationConfig.baseDelay,
           };
         }),
       };
     });
-  }, [values, sectors, max, radius, barWidth, gap, center, animationConfig]);
+  }, [values, sectors, max, radius, barWidth, gap, center]);
 
-  // Optimized animation effect with cleanup
+  // Drive a single outward wave counter shared by all sectors
   useEffect(() => {
-    const timeouts: number[] = [];
-    
-    // Reset visibility
-    setVisible(Array(values.length).fill(null).map(() => Array(max).fill(false)));
-    
-    // Create all animations at once to reduce state updates
-    sectorConfigs.forEach((sectorConfig, sectorIndex) => {
-      sectorConfig.bars.forEach((_, barIndex) => {
-        const timeout = setTimeout(() => {
-          setVisible(prev => {
-            const next = prev.map(arr => [...arr]);
-            next[sectorIndex][barIndex] = true;
-            return next;
-          });
-        }, sectorConfig.bars[barIndex].animationDelay);
-        
-        timeouts.push(timeout);
+    setVisibleR(0);
+
+    const totalSteps = max; // one step per ring
+    const stepMs = 60; // speed per ring
+    let step = 0;
+
+    const id = window.setInterval(() => {
+      step += 1;
+      setVisibleR((prev) => {
+        const next = Math.min(prev + 1, totalSteps);
+        onProgress?.(next);
+        return next;
       });
-    });
+      if (step >= totalSteps) {
+        window.clearInterval(id);
+        // Slight delay to allow final CSS transitions to settle
+        window.setTimeout(() => onBarsComplete?.(), 120);
+      }
+    }, stepMs);
 
-    // Cleanup function
-    return () => {
-      timeouts.forEach(timeout => clearTimeout(timeout));
-    };
-  }, [sectorConfigs, values.length, max]);
+    return () => window.clearInterval(id);
+  }, [max, onBarsComplete, onProgress, values.join(',')]);
 
-  // Memoize rendered paths to avoid recalculation
+  // Render bars with visibility controlled by ring index
   const renderedPaths = useMemo(() => {
     return sectorConfigs.flatMap((sectorConfig, sectorIndex) =>
-      sectorConfig.bars.map((bar, barIndex) => (
-        <path
-          key={`${sectorIndex}-${barIndex}`}
-          d={bar.path}
-          stroke={bar.color}
-          strokeWidth={barWidth}
-          fill="none"
-          strokeLinecap="butt"
-          style={{
-            opacity: visible[sectorIndex]?.[barIndex] ? 1 : 0,
-            transform: visible[sectorIndex]?.[barIndex] ? 'scale(1)' : 'scale(0.7)',
-            transformOrigin: `${center}px ${center}px`,
-            transition: 'opacity 0.3s ease-out, transform 0.3s cubic-bezier(0.4,2,0.6,1)',
-            willChange: visible[sectorIndex]?.[barIndex] ? 'auto' : 'opacity, transform',
-          }}
-        />
-      ))
+      sectorConfig.bars.map((bar, barIndex) => {
+        const isVisible = barIndex < visibleR; // outward growth
+        return (
+          <path
+            key={`${sectorIndex}-${barIndex}`}
+            d={bar.path}
+            stroke={bar.color}
+            strokeWidth={barWidth}
+            fill="none"
+            strokeLinecap="butt"
+            style={{
+              opacity: isVisible ? 1 : 0,
+              transform: isVisible ? 'scale(1)' : 'scale(0.7)',
+              transformOrigin: `${center}px ${center}px`,
+              transition: 'opacity 220ms ease-out, transform 220ms cubic-bezier(0.4,2,0.6,1)',
+              willChange: isVisible ? 'auto' : 'opacity, transform',
+            }}
+          />
+        );
+      })
     );
-  }, [sectorConfigs, visible, barWidth, center]);
+  }, [sectorConfigs, visibleR, barWidth, center]);
 
   return <g>{renderedPaths}</g>;
 }
