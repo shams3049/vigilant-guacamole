@@ -155,6 +155,15 @@ export default function ResponsiveRadarChart({ values }: { values: number[] }) {
     setShowLabels(false);
   }, [values]);
 
+  // Stable callbacks to avoid retriggering child animations
+  const handleProgress = useCallback((visibleR: number) => {
+    if (visibleR >= calculations.max) setShowLabels(true);
+  }, [calculations.max]);
+
+  const handleBarsComplete = useCallback(() => {
+    setShowLabels(true);
+  }, []);
+
   return (
     <div ref={containerRef} className="w-full h-full flex items-center justify-center min-h-0">
       <svg 
@@ -234,10 +243,8 @@ export default function ResponsiveRadarChart({ values }: { values: number[] }) {
           barWidth={config.barWidth}
           gap={config.gap}
           sectors={SECTORS}
-          onProgress={(visibleR) => {
-            if (visibleR >= calculations.max) setShowLabels(true);
-          }}
-          onBarsComplete={() => setShowLabels(true)}
+          onProgress={handleProgress}
+          onBarsComplete={handleBarsComplete}
         />
 
         {/* Render guidelines between sectors */}

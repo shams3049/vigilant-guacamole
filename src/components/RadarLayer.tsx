@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo, useCallback } from 'react';
+import React, { useEffect, useState, useMemo, useCallback, useRef } from 'react';
 import { polarToCartesian, describeArc, type Sector } from '../utils';
 
 const FULL_COLOR = "#3D5241";       // >= 50%
@@ -38,6 +38,12 @@ export default function RadarLayer({
 }) {
   // Visible bars count (radius index) shown so far, same for all sectors
   const [visibleR, setVisibleR] = useState(0);
+
+  // Refs to hold latest callbacks without retriggering effects
+  const onProgressRef = useRef(onProgress);
+  const onBarsCompleteRef = useRef(onBarsComplete);
+  useEffect(() => { onProgressRef.current = onProgress; }, [onProgress]);
+  useEffect(() => { onBarsCompleteRef.current = onBarsComplete; }, [onBarsComplete]);
 
   // Memoize sector configurations (angles/colors/paths)
   const sectorConfigs = useMemo(() => {
@@ -85,18 +91,18 @@ export default function RadarLayer({
       step += 1;
       setVisibleR((prev) => {
         const next = Math.min(prev + 1, totalSteps);
-        onProgress?.(next);
+        onProgressRef.current?.(next);
         return next;
       });
       if (step >= totalSteps) {
         window.clearInterval(id);
         // Slight delay to allow final CSS transitions to settle
-        window.setTimeout(() => onBarsComplete?.(), 120);
+        window.setTimeout(() => onBarsCompleteRef.current?.(), 120);
       }
     }, stepMs);
 
     return () => window.clearInterval(id);
-  }, [max, onBarsComplete, onProgress, values.join(',')]);
+  }, [max, values.join(',' )]);
 
   // Render bars with visibility controlled by ring index
   const renderedPaths = useMemo(() => {
