@@ -121,7 +121,7 @@ export default function RadarLayer({
               opacity: isVisible ? 1 : 0,
               transform: isVisible ? 'scale(1)' : 'scale(0.7)',
               transformOrigin: `${center}px ${center}px`,
-              transition: 'opacity 220ms ease-out, transform 220ms cubic-bezier(0.4,2,0.6,1)',
+              transition: 'opacity 240ms ease-out, transform 240ms cubic-bezier(0.35,1.8,0.6,1)',
               willChange: isVisible ? 'auto' : 'opacity, transform',
             }}
           />

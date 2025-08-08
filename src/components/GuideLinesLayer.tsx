@@ -101,7 +101,7 @@ export default function GuideLinesLayer({
               transition: 'stroke-dashoffset 0.3s cubic-bezier(0.4,2,0.6,1), opacity 0.3s ease',
               transitionDelay: `${i * 20}ms`,
             }}
-            opacity={visible[i] ? 1 : 0.2}
+            opacity={visible[i] ? 0.95 : 0.18}
           />
         );
       })}

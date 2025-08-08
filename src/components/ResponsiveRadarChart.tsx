@@ -173,6 +173,21 @@ export default function ResponsiveRadarChart({ values }: { values: number[] }) {
         preserveAspectRatio="xMidYMid meet"
         style={{ maxHeight: '100vh', maxWidth: '100vw' }}
       >
+        <defs>
+          {/* Subtle, performance-friendly shadows */}
+          <filter id="centerShadow" x="-20%" y="-20%" width="140%" height="140%" colorInterpolationFilters="sRGB">
+            <feDropShadow dx="0" dy="1" stdDeviation="1.2" floodColor="#000" floodOpacity="0.10" />
+          </filter>
+          <filter id="barShadow" x="-12%" y="-12%" width="124%" height="124%" colorInterpolationFilters="sRGB">
+            <feDropShadow dx="0" dy="0.6" stdDeviation="0.5" floodColor="#000" floodOpacity="0.12" />
+          </filter>
+          <filter id="guideShadow" x="-10%" y="-10%" width="120%" height="120%" colorInterpolationFilters="sRGB">
+            <feDropShadow dx="0" dy="0.3" stdDeviation="0.3" floodColor="#000" floodOpacity="0.10" />
+          </filter>
+          <filter id="pointerShadow" x="-20%" y="-20%" width="140%" height="140%" colorInterpolationFilters="sRGB">
+            <feDropShadow dx="0" dy="0.6" stdDeviation="0.6" floodColor="#000" floodOpacity="0.14" />
+          </filter>
+        </defs>
         {/* Center circle with responsive sizing */}
         <circle 
           cx={calculations.center} 
@@ -180,7 +195,8 @@ export default function ResponsiveRadarChart({ values }: { values: number[] }) {
           r={config.centerRadius} 
           fill="#F6E2CA" 
           stroke="#3D5241" 
-          strokeWidth="2" 
+          strokeWidth="2"
+          filter="url(#centerShadow)"
         />
         
         {/* Navigation pointer pointing to the lowest scoring section */}
@@ -208,6 +224,7 @@ export default function ResponsiveRadarChart({ values }: { values: number[] }) {
                 transformOrigin: '0 0',
                 animation: isWobbling ? 'wobbleRotation 2.5s ease-out' : 'none'
               }}
+              filter="url(#pointerShadow)"
             >
               {(() => {
                 // Size at 1.5x, image centered around the origin so its vertical center aligns with the chart center.
@@ -235,30 +252,34 @@ export default function ResponsiveRadarChart({ values }: { values: number[] }) {
         </g>
 
         {/* Render radar bars for each sector */}
-        <RadarLayer
-          values={values}
-          center={calculations.center}
-          max={calculations.max}
-          radius={config.radius}
-          barWidth={config.barWidth}
-          gap={config.gap}
-          sectors={SECTORS}
-          onProgress={handleProgress}
-          onBarsComplete={handleBarsComplete}
-        />
+        <g filter="url(#barShadow)">
+          <RadarLayer
+            values={values}
+            center={calculations.center}
+            max={calculations.max}
+            radius={config.radius}
+            barWidth={config.barWidth}
+            gap={config.gap}
+            sectors={SECTORS}
+            onProgress={handleProgress}
+            onBarsComplete={handleBarsComplete}
+          />
+        </g>
 
         {/* Render guidelines between sectors */}
-        <GuideLinesLayer
-          sectors={SECTORS}
-          center={calculations.center}
-          innerRadius={calculations.guidelineInner}
-          outerRadius={calculations.guidelineOuter}
-          iconSize={config.iconSize}
-          fontSize={config.fontSize}
-          labelRadius={config.iconRadius}
-          avoidRadius={calculations.guidelineInner}
-          safetyGap={12}
-        />
+        <g filter="url(#guideShadow)">
+          <GuideLinesLayer
+            sectors={SECTORS}
+            center={calculations.center}
+            innerRadius={calculations.guidelineInner}
+            outerRadius={calculations.guidelineOuter}
+            iconSize={config.iconSize}
+            fontSize={config.fontSize}
+            labelRadius={config.iconRadius}
+            avoidRadius={calculations.guidelineInner}
+            safetyGap={12}
+          />
+        </g>
 
         {/* Render icons and labels for each sector */}
         <IconLabelLayer

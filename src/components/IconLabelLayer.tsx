@@ -214,13 +214,24 @@ export default function IconLabelLayer({
                       textRendering: 'optimizeLegibility',
                       fontSize: textConfig.fontSize,
                       lineHeight: 1.1,
-                      opacity: lineIndex === 1 ? 0.85 : 1,
+                      // Keep background fully opaque on the chip; do not dim the container.
                       background: 'transparent',
                       borderRadius: 0,
                       display: 'block',
                     }}
                   >
-                    {line}
+                    <span
+                      style={{
+                        background: '#FFFFFF', // ensure readability over guidelines
+                        padding: '1px 3px',
+                        borderRadius: 4,
+                        boxShadow: 'none', // no border visible
+                        border: 'none',
+                        color: lineIndex === 1 ? 'rgba(0,0,0,0.85)' : 'inherit', // subtle text dim only
+                      }}
+                    >
+                      {line}
+                    </span>
                   </div>
                 ))}
               </div>
