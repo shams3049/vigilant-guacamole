@@ -12,7 +12,7 @@ A responsive, animated radar chart widget built with React, TypeScript, and Vite
 
 ## Demo
 
-Visit the live demo: [https://vigilant-guacamole.vercel.app/](https://vigilant-guacamole.vercel.app/)
+Visit the live demo: [https://vigilant-guacamole.vercel.app/](https://vigilant-guacamole.vercel.app/)](https://vigilant-guacamole-gemit.vercel.app/)
 
 ## Usage
 
@@ -25,7 +25,7 @@ The chart reads values from URL query parameters. Each parameter accepts a numbe
 Example URL with all parameters:
 
 ```url
-https://vigilant-guacamole.vercel.app/?koerper_bewegung=9&ernaehrung_genuss=8&stress_erholung=6&geist_emotion=7&lebenssinn_qualitaet=5&umwelt_soziales=4
+https://vigilant-guacamole-gemit.vercel.app/?koerper_bewegung=9&ernaehrung_genuss=8&stress_erholung=6&geist_emotion=7&lebenssinn_qualitaet=5&umwelt_soziales=4
 ```
 
 If a value is missing or invalid, it defaults to `2`.
