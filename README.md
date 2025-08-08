@@ -10,10 +10,6 @@ A responsive, animated radar chart widget built with React, TypeScript, and Vite
 - **German Localization**: Wellness categories in German
 - **URL-Driven**: Chart values controlled via URL parameters
 
-## Demo
-
-Visit the live demo: [https://vigilant-guacamole.vercel.app/](https://vigilant-guacamole.vercel.app/)](https://vigilant-guacamole-gemit.vercel.app/)
-
 ## Usage
 
 The chart reads values from URL query parameters. Each parameter accepts a number from `0` to `9`:
