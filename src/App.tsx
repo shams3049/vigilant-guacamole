@@ -11,12 +11,31 @@ const SECTION_KEYS = [
   "umwelt_soziales",       // Umwelt & Soziales (10 o'clock)
 ];
 
+// Accept common alias keys from legacy/variant links
+const PARAM_ALIASES: Record<string, string[]> = {
+  geist_emotionen: ["geist_emotion"],
+};
+
 // Parse values for each category from the query string. If a value is missing
 // or invalid it falls back to `2` so the chart always has reasonable data.
 function parseStrengths(): number[] {
   const params = new URLSearchParams(window.location.search);
-  return SECTION_KEYS.map(key => {
-    const val = Number(params.get(key));
+  return SECTION_KEYS.map((key) => {
+    // Try the canonical key first
+    let raw = params.get(key);
+    // Fall back to any alias keys if needed
+    if (raw === null && PARAM_ALIASES[key]) {
+      for (const alt of PARAM_ALIASES[key]) {
+        const v = params.get(alt);
+        if (v !== null) {
+          raw = v;
+          break;
+        }
+      }
+    }
+
+    const val = Number(raw);
+    // Default to 2 if missing/invalid, clamp to [0,9]
     return isNaN(val) ? 2 : Math.max(0, Math.min(9, val));
   });
 }

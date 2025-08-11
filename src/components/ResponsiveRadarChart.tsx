@@ -227,15 +227,19 @@ export default function ResponsiveRadarChart({ values }: { values: number[] }) {
               filter="url(#pointerShadow)"
             >
               {(() => {
-                // Size at 1.5x, image centered around the origin so its vertical center aligns with the chart center.
-                const baseHeight = Math.max(config.centerRadius * 1.65, 44);
-                const height = baseHeight * 1.5; // 1.5x
-                const width = (32 / 48) * height; // maintain aspect ratio from viewBox (32x48)
-                // Fine-tune offsets if needed.
-                const offsetX = 0;
-                const offsetY = 0;
-                const x = -width / 2 + offsetX;
-                const y = -height / 2 + offsetY; // vertical center at origin
+                // Ensure the icon fully fits inside the center circle with ~1% margin to the border.
+                // We inscribe the icon's axis-aligned bounding box into a circle of radius (centerRadius * 0.99).
+                const marginRatio = 0.01; // 1% space to the border
+                const innerRadius = Math.max(0, config.centerRadius * (1 - marginRatio));
+                const aspect = 32 / 48; // width/height from SVG viewBox
+                // For a rectangle centered at origin, half-diagonal must be <= innerRadius.
+                // halfDiag = 0.5 * sqrt(w^2 + h^2) with w = aspect * h
+                // => h <= 2*innerRadius / sqrt(aspect^2 + 1)
+                const height = (2 * innerRadius) / Math.sqrt(aspect * aspect + 1);
+                const width = aspect * height;
+                // Center the image at the origin so it remains inside the middle circle while rotating
+                const x = -width / 2;
+                const y = -height / 2;
                 return (
                   <image
                     href="/assets/naviationicon.svg"
