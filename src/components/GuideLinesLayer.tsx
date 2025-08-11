@@ -49,36 +49,16 @@ export default function GuideLinesLayer({
         // Start exactly on the outermost bar edge
         const p1 = polarToCartesian(center, center, innerRadius, angle);
 
-  // Reconstruct the label box geometry to compute where the inward edge lies along the ray
-  const boxWidth = Math.round(iconSize * 2.8);
-  // Estimate box height similar to IconLabelLayer: icon + margin + at least one line
-  const iconBlock = Math.round(iconSize * 0.9);
-  const effFont = Math.max(fontSize * 0.98, 12);
-  const marginTop = Math.max(4, Math.round(effFont * 0.3));
-  const lineHeightPx = Math.round(effFont * 1.1);
-  const minLinesBlock = lineHeightPx; // at least one line; actual may be larger but inward extent uses axis-aligned half extents
-  const paddingBlock = 8;
-  const boxHeight = Math.round(iconBlock + marginTop + minLinesBlock + paddingBlock);
-
-        // Nominal label center at base label radius
-        const nominal = polarToCartesian(center, center, labelRadius, angle);
-        const dx = nominal.x - center;
-        const dy = nominal.y - center;
-        const dist = Math.hypot(dx, dy) || 1;
-        const ux = dx / dist;
-        const uy = dy / dist;
-
-        // Inward half-extent of the axis-aligned box along the radial direction
-        const inwardHalfExtent = Math.abs(ux) * (boxWidth / 2) + Math.abs(uy) * (boxHeight / 2);
-
-        // Final label center radius (same as IconLabelLayer logic)
-        const finalLabelCenterRadius = Math.max(labelRadius, avoidRadius + safetyGap + inwardHalfExtent);
-
-        // Radius to the box's inward edge where the guideline should touch
-        const touchRadius = finalLabelCenterRadius - inwardHalfExtent;
-
-        // Ensure we don't create a negative/zero-length line (clamp slightly beyond innerRadius)
-        const endRadius = Math.max(innerRadius, Math.min(touchRadius, outerRadius));
+  // Compute icon center radius independent of label text (must match IconLabelLayer)
+  const iconBadgeRadius = (iconSize * 0.9) / 2;
+  const minIconCenterRadius = avoidRadius + safetyGap + iconBadgeRadius;
+  const iconCenterRadius = Math.max(labelRadius, minIconCenterRadius);
+  // Apply additional 20% on top (total 36% shorter from base)
+  const shrinkFactor = 0.64;
+  const endRadiusBase = iconCenterRadius - iconBadgeRadius; // icon inward edge
+  const shortenedEnd = innerRadius + shrinkFactor * (endRadiusBase - innerRadius);
+  // End the guideline at the shortened icon inward edge
+  const endRadius = Math.max(innerRadius, Math.min(shortenedEnd, outerRadius));
 
         const p2 = polarToCartesian(center, center, endRadius, angle);
 
