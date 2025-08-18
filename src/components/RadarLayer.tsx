@@ -1,18 +1,18 @@
 import React, { useEffect, useState, useMemo, useCallback, useRef } from 'react';
 import { polarToCartesian, describeArc, type Sector } from '../utils';
 
-const FULL_COLOR = "#3D5241";       // >= 50%
-const MEDIUM_COLOR = "#7C987C";     // < 50%
-const LOW_COLOR = "#FFAD4C";        // < 30%
-const LOWEST_COLOR = "#FF8B7B";     // < 20%
+const FULL_COLOR = "#3D5241";       // 10
+const MEDIUM_COLOR = "#7C987C";     // 7-9
+const LOW_COLOR = "#FFAD4C";        // 4-6
+const LOWEST_COLOR = "#FF8B7B";     // 0-3
 const INACTIVE_COLOR = "#E0E0E0";
 
 function getStrengthColor(strength: number, max: number): string {
-  const percent = strength / max;
-  if (percent >= 0.5) return FULL_COLOR;
-  if (percent >= 0.3) return MEDIUM_COLOR;
-  if (percent >= 0.2) return LOW_COLOR;
-  return LOWEST_COLOR;
+  // Explicit score-to-color mapping
+  if (strength >= 10) return FULL_COLOR;      // dark green
+  if (strength >= 7) return MEDIUM_COLOR;     // light green
+  if (strength >= 4) return LOW_COLOR;        // yellow
+  return LOWEST_COLOR;                         // red (includes 0-3)
 }
 
 export default function RadarLayer({

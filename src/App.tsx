@@ -35,8 +35,8 @@ function parseStrengths(): number[] {
     }
 
     const val = Number(raw);
-    // Default to 2 if missing/invalid, clamp to [0,9]
-    return isNaN(val) ? 2 : Math.max(0, Math.min(9, val));
+  // Default to 2 if missing/invalid, clamp to [0,10]
+  return isNaN(val) ? 2 : Math.max(0, Math.min(10, val));
   });
 }
 

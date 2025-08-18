@@ -30,3 +30,28 @@ coverage/
 *.local
 *.sublime-workspace
 *.sublime-project
+
+# VS Code Local History
+.history/
+
+# TypeScript build info
+*.tsbuildinfo
+
+# Lint/format caches
+.eslintcache
+
+# Editor swap/backup files
+*.swp
+*.swo
+*~
+
+# Generic caches
+.cache/
+.nuxt/
+.next/
+.turbo/
+
+# OS metadata (extra)
+.AppleDouble
+.LSOverride
+Thumbs.db

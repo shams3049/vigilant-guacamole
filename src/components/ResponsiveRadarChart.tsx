@@ -103,7 +103,7 @@ export default function ResponsiveRadarChart({ values }: { values: number[] }) {
   
   const calculations = useMemo(() => {
     const center = size / 2;
-    const max = 9;
+  const max = 10;
 
     // Compute the outer edge radius of the outermost bar
     const outermostRingCenterRadius = config.radius + (max - 1) * (config.barWidth + config.gap);
@@ -113,7 +113,7 @@ export default function ResponsiveRadarChart({ values }: { values: number[] }) {
     
     // Calculate the average value and its percentage
     const avg = values.reduce((a, b) => a + b, 0) / values.length;
-    const avgPercent = Math.round((avg / max) * 100);
+  const avgPercent = Math.round((avg / max) * 100);
     
     // Find the sector with the lowest score for the navigation pointer
     const minValueIndex = values.indexOf(Math.min(...values));
