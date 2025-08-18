@@ -149,6 +149,13 @@ export default function IconLabelLayer({
   // Memoized text configuration to prevent recalculation
   const textConfig = useMemo(() => getResponsiveTextConfig(fontSize, iconSize), [fontSize, iconSize]);
 
+  // Detect Safari (exclude Chrome/Chromium/Edge). Helps decide foreignObject fallback.
+  const isSafari = useMemo(() => {
+    if (typeof navigator === 'undefined') return false;
+    const ua = navigator.userAgent;
+    return /Safari\//.test(ua) && !/(Chrome|Chromium|Edg)\//.test(ua);
+  }, []);
+
   return (
     <g>
       {sectors.map((s, i) => {
@@ -196,146 +203,205 @@ export default function IconLabelLayer({
   const fy = Math.round(fyUnclamped);
 
   return (
-          <foreignObject
-            key={i}
-            x={fx}
-            y={fy}
-            width={boxWidth}
-            height={boxHeight}
-            style={{
-              opacity: 1, // no fade-in
-              transform: showLabels ? 'scale(1)' : 'scale(0)',
-              transformOrigin: '50% 50%',
-              transition: 'transform 350ms cubic-bezier(0.4, 0, 0.2, 1)',
-              transitionDelay: '0ms',
-              overflow: 'visible',
-            }}
-          >
-            {/* Render icon and label in a vertical flex layout */}
-            <div style={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'flex-start',
-              width: '100%',
-              height: '100%',
-              fontSize: layout.fontSize,
-              textAlign: 'center',
-              lineHeight: 1.1,
-              color: '#000',
-              padding: '4px',
-              boxSizing: 'border-box',
-              fontFamily: 'system-ui, -apple-system, sans-serif',
-              fontWeight: '500',
-              // Improve cross-browser consistency inside foreignObject
-              WebkitFontSmoothing: 'antialiased',
-              MozOsxFontSmoothing: 'grayscale',
-              contain: 'layout paint size',
-              background: 'transparent',
-            }}>
-              {/* Conditionally render text above icon for top sector */}
-              {textAbove && (
-                <div style={{
-                  marginBottom: Math.max(4, Math.round(layout.fontSize * 0.3)),
-                  width: '100%',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  gap: '1px',
-                }}>
-                  {[textLines[0], textLines[1]].map((line, lineIndex) => (
-                    <div key={lineIndex} style={{
-                      width: '100%',
-                      wordBreak: 'break-word',
-                      overflowWrap: 'anywhere',
-                      hyphens: 'auto',
-                      WebkitHyphens: 'auto',
-                      textRendering: 'optimizeLegibility',
-                      fontSize: layout.fontSize,
-                      lineHeight: 1.1,
-                      background: 'transparent',
-                      borderRadius: 0,
-                      display: 'block',
-                    }}>
-                      <span style={{
-                        background: '#FFFFFF',
-                        padding: '1px 3px',
-                        borderRadius: 4,
-                        boxShadow: 'none',
-                        border: 'none',
-                        color: 'inherit',
-                      }}>{line}</span>
-                    </div>
-                  ))}
-                </div>
-              )}
+          isSafari ? (
+            // Safari fallback: render labels as pure SVG to avoid foreignObject glitches
+            <g key={i} opacity={showLabels ? 1 : 0} style={{ transition: 'opacity 260ms ease-out' }}>
+              {/* Icon circle */}
+              <circle
+                cx={fx + boxWidth / 2}
+                cy={fy + iconCenterOffsetY}
+                r={Math.round(iconSize * 0.9) / 2}
+                fill="#F6E2CA"
+                stroke="rgba(61, 82, 65, 0.1)"
+                strokeWidth={1}
+              />
+              {/* Icon image */}
+              <image
+                href={s.icon}
+                x={fx + boxWidth / 2 - Math.round(iconSize * 0.6) / 2}
+                y={fy + iconCenterOffsetY - Math.round(iconSize * 0.6) / 2}
+                width={Math.round(iconSize * 0.6)}
+                height={Math.round(iconSize * 0.6)}
+                preserveAspectRatio="xMidYMid meet"
+              />
+              {/* Text chips */}
+              {(() => {
+                const padX = 3; // matches '1px 3px' used in HTML chip
+                const chipH = lineHeightPx; // approximate
+                const measure = (line: string) => Math.max(10, Math.round(line.length * layout.fontSize * 0.6) + padX * 2);
+                const w1 = measure(textLines[0]);
+                const w2 = measure(textLines[1]);
+                // Top-left x of centered chips
+                const x1 = fx + Math.round((boxWidth - w1) / 2);
+                const x2 = fx + Math.round((boxWidth - w2) / 2);
+                if (textAbove) {
+                  const topY = fy + 4; // content padding
+                  const y1 = topY;
+                  const y2 = topY + chipH + 1; // 1px gap
+                  return (
+                    <g>
+                      <rect x={x1} y={y1} width={w1} height={chipH} rx={4} ry={4} fill="#FFFFFF" />
+                      <text x={fx + boxWidth / 2} y={y1 + chipH / 2} textAnchor="middle" dominantBaseline="middle" fontSize={layout.fontSize} fontFamily="system-ui, -apple-system, sans-serif" fill="#000">{textLines[0]}</text>
+                      <rect x={x2} y={y2} width={w2} height={chipH} rx={4} ry={4} fill="#FFFFFF" />
+                      <text x={fx + boxWidth / 2} y={y2 + chipH / 2} textAnchor="middle" dominantBaseline="middle" fontSize={layout.fontSize} fontFamily="system-ui, -apple-system, sans-serif" fill="#000">{textLines[1]}</text>
+                    </g>
+                  );
+                }
+                // Below icon
+                const startY = fy + 4 + Math.round(iconSize * 0.9) + Math.max(4, Math.round(layout.fontSize * 0.3));
+                const y1 = startY;
+                const y2 = startY + chipH + 1;
+                return (
+                  <g>
+                    <rect x={x1} y={y1} width={w1} height={chipH} rx={4} ry={4} fill="#FFFFFF" />
+                    <text x={fx + boxWidth / 2} y={y1 + chipH / 2} textAnchor="middle" dominantBaseline="middle" fontSize={layout.fontSize} fontFamily="system-ui, -apple-system, sans-serif" fill="#000">{textLines[0]}</text>
+                    <rect x={x2} y={y2} width={w2} height={chipH} rx={4} ry={4} fill="#FFFFFF" />
+                    <text x={fx + boxWidth / 2} y={y2 + chipH / 2} textAnchor="middle" dominantBaseline="middle" fontSize={layout.fontSize} fontFamily="system-ui, -apple-system, sans-serif" fill="#000">{textLines[1]}</text>
+                  </g>
+                );
+              })()}
+            </g>
+          ) : (
+            <foreignObject
+              key={i}
+              x={fx}
+              y={fy}
+              width={boxWidth}
+              height={boxHeight}
+              requiredExtensions="http://www.w3.org/1999/xhtml"
+              style={{
+                opacity: showLabels ? 1 : 0,
+                transition: 'opacity 260ms ease-out',
+                overflow: 'hidden',
+              }}
+            >
+              {/* Render icon and label in a vertical flex layout */}
+              <div style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'flex-start',
+                width: '100%',
+                height: '100%',
+                fontSize: layout.fontSize,
+                textAlign: 'center',
+                lineHeight: 1.1,
+                color: '#000',
+                padding: '4px',
+                boxSizing: 'border-box',
+                fontFamily: 'system-ui, -apple-system, sans-serif',
+                fontWeight: '500',
+                // Improve cross-browser consistency inside foreignObject
+                WebkitFontSmoothing: 'antialiased',
+                MozOsxFontSmoothing: 'grayscale',
+                background: 'transparent',
+                WebkitBackfaceVisibility: 'hidden',
+                transform: 'translateZ(0)',
+              }}>
+                {/* Conditionally render text above icon for top sector */}
+                {textAbove && (
+                  <div style={{
+                    marginBottom: Math.max(4, Math.round(layout.fontSize * 0.3)),
+                    width: '100%',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    gap: '1px',
+                  }}>
+                    {[textLines[0], textLines[1]].map((line, lineIndex) => (
+                      <div key={lineIndex} style={{
+                        width: '100%',
+                        wordBreak: 'break-word',
+                        overflowWrap: 'anywhere',
+                        hyphens: 'auto',
+                        WebkitHyphens: 'auto',
+                        textRendering: 'optimizeLegibility',
+                        fontSize: layout.fontSize,
+                        lineHeight: 1.1,
+                        background: 'transparent',
+                        borderRadius: 0,
+                        display: 'block',
+                      }}>
+                        <span style={{
+                          background: '#FFFFFF',
+                          padding: '1px 3px',
+                          borderRadius: 4,
+                          boxShadow: 'none',
+                          border: 'none',
+                          color: 'inherit',
+                        }}>{line}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
 
-              {/* Icon container with better responsive sizing */}
-              <div
-                style={{
-                  backgroundColor: '#F6E2CA',
-                  borderRadius: '50%',
-                  width: Math.round(iconSize * 0.9),
-                  height: Math.round(iconSize * 0.9),
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  flexShrink: 0,
-                  border: '1px solid rgba(61, 82, 65, 0.1)',
-                  boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
-                }}
-              >
-                <img
-                  src={s.icon}
-                  alt={s.label}
-                  style={{ 
-                    width: Math.round(iconSize * 0.6),
-                    height: Math.round(iconSize * 0.6),
-                    objectFit: 'contain',
-                    display: 'block',
+                {/* Icon container with better responsive sizing */}
+                <div
+                  style={{
+                    backgroundColor: '#F6E2CA',
+                    borderRadius: '50%',
+                    width: Math.round(iconSize * 0.9),
+                    height: Math.round(iconSize * 0.9),
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0,
+                    border: '1px solid rgba(61, 82, 65, 0.1)',
+                    boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
                   }}
-                  loading="lazy"
-                />
-              </div>
-
-              {/* Text below icon for non-top sectors */}
-              {!textAbove && (
-                <div style={{
-                  marginTop: Math.max(4, Math.round(layout.fontSize * 0.3)),
-                  width: '100%',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  gap: '1px',
-                }}>
-                  {[textLines[0], textLines[1]].map((line, lineIndex) => (
-                    <div key={lineIndex} style={{
-                      width: '100%',
-                      wordBreak: 'break-word',
-                      overflowWrap: 'anywhere',
-                      hyphens: 'auto',
-                      WebkitHyphens: 'auto',
-                      textRendering: 'optimizeLegibility',
-                      fontSize: layout.fontSize,
-                      lineHeight: 1.1,
-                      background: 'transparent',
-                      borderRadius: 0,
+                >
+                  <img
+                    src={s.icon}
+                    alt={s.label}
+                    style={{ 
+                      width: Math.round(iconSize * 0.6),
+                      height: Math.round(iconSize * 0.6),
+                      objectFit: 'contain',
                       display: 'block',
-                    }}>
-                      <span style={{
-                        background: '#FFFFFF',
-                        padding: '1px 3px',
-                        borderRadius: 4,
-                        boxShadow: 'none',
-                        border: 'none',
-                        color: 'inherit',
-                      }}>{line}</span>
-                    </div>
-                  ))}
+                    }}
+                    loading="lazy"
+                  />
                 </div>
-              )}
-            </div>
-          </foreignObject>
+
+                {/* Text below icon for non-top sectors */}
+                {!textAbove && (
+                  <div style={{
+                    marginTop: Math.max(4, Math.round(layout.fontSize * 0.3)),
+                    width: '100%',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    gap: '1px',
+                  }}>
+                    {[textLines[0], textLines[1]].map((line, lineIndex) => (
+                      <div key={lineIndex} style={{
+                        width: '100%',
+                        wordBreak: 'break-word',
+                        overflowWrap: 'anywhere',
+                        hyphens: 'auto',
+                        WebkitHyphens: 'auto',
+                        textRendering: 'optimizeLegibility',
+                        fontSize: layout.fontSize,
+                        lineHeight: 1.1,
+                        background: 'transparent',
+                        borderRadius: 0,
+                        display: 'block',
+                      }}>
+                        <span style={{
+                          background: '#FFFFFF',
+                          padding: '1px 3px',
+                          borderRadius: 4,
+                          boxShadow: 'none',
+                          border: 'none',
+                          color: 'inherit',
+                        }}>{line}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </foreignObject>
+          )
         );
       })}
     </g>
