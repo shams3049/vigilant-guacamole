@@ -8,14 +8,9 @@ const LOWEST_COLOR = "#FF8B7B";     // red (0-3)
 const INACTIVE_COLOR = "#E0E0E0";
 
 function getStrengthColor(strength: number, max: number): string {
-  // Explicit score-to-color mapping (inclusive thresholds):
-  // 8-10 -> dark green
-  // 7    -> light green
-  // 4-6  -> yellow
-  // 0-3  -> red
   if (strength >= 9) return FULL_COLOR;       // dark green (9-10)
   if (strength >= 7) return MEDIUM_COLOR;     // light green (7-8)
-  if (strength >= 4) return LOW_COLOR;        // yellow
+  if (strength >= 4) return LOW_COLOR;        // yellow (4-6)
   return LOWEST_COLOR;                        // red (0-3)
 }
 
