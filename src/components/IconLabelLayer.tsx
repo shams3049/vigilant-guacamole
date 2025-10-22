@@ -24,14 +24,20 @@ function computeTwoLineLayout(
   // Split into tokens, but also split on internal hyphens to encourage natural breaks.
   const rawWords = text.split(' ');
   const words = rawWords.flatMap(w => {
-    // Keep leading or trailing hyphen as separate tokens to preserve semantics
+    // If the word starts with a hyphen (e.g. "-qualität"), keep it as a single token
+    // to avoid inserting a space between the hyphen and the following text.
+    if (w.startsWith('-')) return [w];
+
+    // For internal hyphens (e.g. "Stress-Erholung") split them but avoid
+    // producing a standalone '-' token that would later be joined with spaces
+    // (which causes rendering like "- qualität").
     if (w.includes('-') && w.length > 1) {
-      // Split but keep hyphens as standalone tokens when not at ends
       const pieces = w.split('-');
       const tokens: string[] = [];
       pieces.forEach((p, idx) => {
         if (p) tokens.push(p);
-        if (idx < pieces.length - 1) tokens.push('-');
+        // Only push a standalone hyphen if it's between two non-empty pieces
+        if (idx < pieces.length - 1 && p) tokens.push('-');
       });
       return tokens;
     }

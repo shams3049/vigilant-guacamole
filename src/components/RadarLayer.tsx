@@ -1,18 +1,22 @@
 import React, { useEffect, useState, useMemo, useCallback, useRef } from 'react';
 import { polarToCartesian, describeArc, type Sector } from '../utils';
 
-const FULL_COLOR = "#3D5241";       // 10
-const MEDIUM_COLOR = "#7C987C";     // 7-9
-const LOW_COLOR = "#FFAD4C";        // 4-6
-const LOWEST_COLOR = "#FF8B7B";     // 0-3
+const FULL_COLOR = "#3D5241";       // dark green (9-10)
+const MEDIUM_COLOR = "#7C987C";     // light green (7-8)
+const LOW_COLOR = "#FFAD4C";        // yellow (4-6)
+const LOWEST_COLOR = "#FF8B7B";     // red (0-3)
 const INACTIVE_COLOR = "#E0E0E0";
 
 function getStrengthColor(strength: number, max: number): string {
-  // Explicit score-to-color mapping
-  if (strength >= 10) return FULL_COLOR;      // dark green
-  if (strength >= 7) return MEDIUM_COLOR;     // light green
+  // Explicit score-to-color mapping (inclusive thresholds):
+  // 8-10 -> dark green
+  // 7    -> light green
+  // 4-6  -> yellow
+  // 0-3  -> red
+  if (strength >= 8) return FULL_COLOR;       // dark green (8-10)
+  if (strength >= 7) return MEDIUM_COLOR;     // light green (7)
   if (strength >= 4) return LOW_COLOR;        // yellow
-  return LOWEST_COLOR;                         // red (includes 0-3)
+  return LOWEST_COLOR;                        // red (0-3)
 }
 
 export default function RadarLayer({
@@ -130,5 +134,15 @@ export default function RadarLayer({
     );
   }, [sectorConfigs, visibleR, barWidth, center]);
 
-  return <g>{renderedPaths}</g>;
+  // Optional debug overlay: when `debug_colors=1` is present in the URL,
+  // render a small, non-intrusive text list in the top-left of the SVG
+  // showing sector index, strength and the chosen color. This helps
+  // validate color thresholds in-browser without additional tooling.
+  const params = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
+  const showDebug = params?.get('debug_colors') === '1';
+  return (
+    <g>
+      {renderedPaths}
+    </g>
+  );
 }
