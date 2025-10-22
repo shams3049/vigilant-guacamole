@@ -13,8 +13,8 @@ function getStrengthColor(strength: number, max: number): string {
   // 7    -> light green
   // 4-6  -> yellow
   // 0-3  -> red
-  if (strength >= 8) return FULL_COLOR;       // dark green (8-10)
-  if (strength >= 7) return MEDIUM_COLOR;     // light green (7)
+  if (strength >= 9) return FULL_COLOR;       // dark green (9-10)
+  if (strength >= 7) return MEDIUM_COLOR;     // light green (7-8)
   if (strength >= 4) return LOW_COLOR;        // yellow
   return LOWEST_COLOR;                        // red (0-3)
 }
