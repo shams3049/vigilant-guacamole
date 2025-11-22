@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { polarToCartesian, type Sector } from '../utils';
+import { polarToCartesian, type Sector, type RadarChartColors, DEFAULT_RADAR_COLORS } from '../utils';
 
 interface GuideLinesLayerProps {
   sectors: Sector[];
@@ -12,6 +12,7 @@ interface GuideLinesLayerProps {
   labelRadius: number; // base radius used for label box center (IconLabelLayer.radius)
   avoidRadius: number; // same as calculations.guidelineInner
   safetyGap?: number; // pixels between radar and label box (same default as IconLabelLayer)
+  colors?: RadarChartColors;
 }
 
 export default function GuideLinesLayer({
@@ -24,6 +25,7 @@ export default function GuideLinesLayer({
   labelRadius,
   avoidRadius,
   safetyGap = 12,
+  colors = DEFAULT_RADAR_COLORS,
 }: GuideLinesLayerProps) {
   // Animation state: track which guidelines are visible
   const [visible, setVisible] = useState(Array(sectors.length).fill(false));
@@ -72,7 +74,7 @@ export default function GuideLinesLayer({
             y1={p1.y}
             x2={p2.x}
             y2={p2.y}
-            stroke="#3D5241"
+            stroke={colors.primary}
             strokeWidth={1.5}
             strokeLinecap="round"
             strokeDasharray={length}

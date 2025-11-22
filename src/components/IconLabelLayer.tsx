@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useMemo } from 'react';
-import { polarToCartesian, type Sector } from '../utils';
+import { polarToCartesian, type Sector, type RadarChartColors, DEFAULT_RADAR_COLORS } from '../utils';
 
 // Responsive text sizing based on screen size
 function getResponsiveTextConfig(fontSize: number, iconSize: number) {
@@ -142,6 +142,7 @@ export default function IconLabelLayer({
   avoidRadius, // keep labels at least this far from center (outer radar radius)
   safetyGap = 10, // minimum pixels between radar and the label box edge
   showLabels = false, // New: control reveal from parent
+  colors = DEFAULT_RADAR_COLORS,
 }: {
   sectors: Sector[];
   center: number;
@@ -151,6 +152,7 @@ export default function IconLabelLayer({
   avoidRadius: number;
   safetyGap?: number;
   showLabels?: boolean;
+  colors?: RadarChartColors;
 }) {
   // Memoized text configuration to prevent recalculation
   const textConfig = useMemo(() => getResponsiveTextConfig(fontSize, iconSize), [fontSize, iconSize]);
@@ -217,8 +219,8 @@ export default function IconLabelLayer({
                 cx={fx + boxWidth / 2}
                 cy={fy + iconCenterOffsetY}
                 r={Math.round(iconSize * 0.9) / 2}
-                fill="#F6E2CA"
-                stroke="rgba(61, 82, 65, 0.1)"
+                fill={colors.iconBackground}
+                stroke={`${colors.primary}1A`}
                 strokeWidth={1}
               />
               {/* Icon image */}
@@ -246,9 +248,9 @@ export default function IconLabelLayer({
                   const y2 = topY + chipH + 1; // 1px gap
                   return (
                     <g>
-                      <rect x={x1} y={y1} width={w1} height={chipH} rx={4} ry={4} fill="#FFFFFF" />
+                      <rect x={x1} y={y1} width={w1} height={chipH} rx={4} ry={4} fill={colors.labelBackground} />
                       <text x={fx + boxWidth / 2} y={y1 + chipH / 2} textAnchor="middle" dominantBaseline="middle" fontSize={layout.fontSize} fontFamily="system-ui, -apple-system, sans-serif" fill="#000">{textLines[0]}</text>
-                      <rect x={x2} y={y2} width={w2} height={chipH} rx={4} ry={4} fill="#FFFFFF" />
+                      <rect x={x2} y={y2} width={w2} height={chipH} rx={4} ry={4} fill={colors.labelBackground} />
                       <text x={fx + boxWidth / 2} y={y2 + chipH / 2} textAnchor="middle" dominantBaseline="middle" fontSize={layout.fontSize} fontFamily="system-ui, -apple-system, sans-serif" fill="#000">{textLines[1]}</text>
                     </g>
                   );
@@ -259,9 +261,9 @@ export default function IconLabelLayer({
                 const y2 = startY + chipH + 1;
                 return (
                   <g>
-                    <rect x={x1} y={y1} width={w1} height={chipH} rx={4} ry={4} fill="#FFFFFF" />
+                    <rect x={x1} y={y1} width={w1} height={chipH} rx={4} ry={4} fill={colors.labelBackground} />
                     <text x={fx + boxWidth / 2} y={y1 + chipH / 2} textAnchor="middle" dominantBaseline="middle" fontSize={layout.fontSize} fontFamily="system-ui, -apple-system, sans-serif" fill="#000">{textLines[0]}</text>
-                    <rect x={x2} y={y2} width={w2} height={chipH} rx={4} ry={4} fill="#FFFFFF" />
+                    <rect x={x2} y={y2} width={w2} height={chipH} rx={4} ry={4} fill={colors.labelBackground} />
                     <text x={fx + boxWidth / 2} y={y2 + chipH / 2} textAnchor="middle" dominantBaseline="middle" fontSize={layout.fontSize} fontFamily="system-ui, -apple-system, sans-serif" fill="#000">{textLines[1]}</text>
                   </g>
                 );
@@ -329,7 +331,7 @@ export default function IconLabelLayer({
                         display: 'block',
                       }}>
                         <span style={{
-                          background: '#FFFFFF',
+                          background: colors.labelBackground,
                           padding: '1px 3px',
                           borderRadius: 4,
                           boxShadow: 'none',
@@ -344,7 +346,7 @@ export default function IconLabelLayer({
                 {/* Icon container with better responsive sizing */}
                 <div
                   style={{
-                    backgroundColor: '#F6E2CA',
+                    backgroundColor: colors.iconBackground,
                     borderRadius: '50%',
                     width: Math.round(iconSize * 0.9),
                     height: Math.round(iconSize * 0.9),
@@ -352,7 +354,7 @@ export default function IconLabelLayer({
                     alignItems: 'center',
                     justifyContent: 'center',
                     flexShrink: 0,
-                    border: '1px solid rgba(61, 82, 65, 0.1)',
+                    border: `1px solid ${colors.primary}1A`,
                     boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
                   }}
                 >
@@ -394,7 +396,7 @@ export default function IconLabelLayer({
                         display: 'block',
                       }}>
                         <span style={{
-                          background: '#FFFFFF',
+                          background: colors.labelBackground,
                           padding: '1px 3px',
                           borderRadius: 4,
                           boxShadow: 'none',
