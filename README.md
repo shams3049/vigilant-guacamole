@@ -7,10 +7,64 @@ A responsive, animated radar chart widget built with React, TypeScript, and Vite
 - **Responsive Design**: Adapts seamlessly to all screen sizes
 - **Smooth Animations**: Staggered animations with performance optimization
 - **Interactive**: Animated radar visualization
-- **German Localization**: Wellness categories in German
-- **URL-Driven**: Chart values controlled via URL parameters
+- **Customizable Colors**: Full control over all colors used in the chart
+- **Reusable Component**: Can be integrated into any React application
+- **German Localization**: Wellness categories in German (default)
+- **URL-Driven**: Chart values controlled via URL parameters (in demo app)
 
-## Usage
+## Using as a Component
+
+The radar chart is now available as a **reusable React component** that can be integrated into any application! 
+
+### Quick Start
+
+```tsx
+import ResponsiveRadarChart from './components/ResponsiveRadarChart';
+
+function MyApp() {
+  const values = [7, 5, 3, 8, 6, 4]; // Your data (0-10 scale)
+  
+  return (
+    <div style={{ width: '100%', height: '600px' }}>
+      <ResponsiveRadarChart values={values} />
+    </div>
+  );
+}
+```
+
+### Custom Colors
+
+You can customize all colors to match your brand:
+
+```tsx
+import ResponsiveRadarChart from './components/ResponsiveRadarChart';
+import type { RadarChartColors } from './utils';
+
+const myColors: RadarChartColors = {
+  full: "#1E40AF",       // Blue for high scores
+  medium: "#3B82F6",     // Medium blue
+  low: "#FCD34D",        // Yellow
+  lowest: "#EF4444",     // Red
+  inactive: "#D1D5DB",   // Gray
+  primary: "#1F2937",    // Borders & guidelines
+  background: "#F3F4F6", // Center circle
+  labelBackground: "#FFFFFF",
+  iconBackground: "#E5E7EB",
+};
+
+function MyApp() {
+  return (
+    <ResponsiveRadarChart 
+      values={[7, 5, 3, 8, 6, 4]}
+      colors={myColors}
+    />
+  );
+}
+```
+
+**📖 For complete documentation and examples, see [COMPONENT_USAGE.md](./COMPONENT_USAGE.md)**
+
+## Demo App Usage
 
 The chart reads values from URL query parameters. Each parameter accepts a number from `0` to `9`:
 
@@ -47,7 +101,7 @@ For Vercel deployment:
 2. Connect your repository to Vercel
 3. Vercel will automatically build and deploy
 
-## Categories
+## Default Categories
 
 The wellness categories displayed on the radar chart:
 
@@ -57,3 +111,17 @@ The wellness categories displayed on the radar chart:
 - **Geist & Emotionen** (`geist_emotion`) - Mind & Emotions
 - **Lebenssinn & -qualität** (`lebenssinn_qualitaet`) - Life Purpose & Quality
 - **Umwelt & Soziales** (`umwelt_soziales`) - Environment & Social
+
+## Component Files
+
+To use this radar chart in your own application, copy these files:
+
+- `src/components/ResponsiveRadarChart.tsx` - Main component
+- `src/components/RadarLayer.tsx` - Radar bars layer
+- `src/components/GuideLinesLayer.tsx` - Guidelines between sectors
+- `src/components/IconLabelLayer.tsx` - Icons and labels
+- `src/utils.ts` - Utility functions
+- `src/types.ts` - TypeScript types and interfaces
+
+See [COMPONENT_USAGE.md](./COMPONENT_USAGE.md) for detailed integration instructions.
+
