@@ -16,6 +16,9 @@ export interface RadarChartColors {
   iconBackground: string; // background for icon badges
 }
 
+// Opacity value for borders and strokes (hex: 1A = ~10% opacity)
+export const BORDER_OPACITY = '1A';
+
 // Default color scheme matching the original design
 export const DEFAULT_RADAR_COLORS: RadarChartColors = {
   full: "#3D5241",       // dark green (9-10)

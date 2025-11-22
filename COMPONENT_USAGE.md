@@ -62,7 +62,33 @@ function MyApp() {
 
 ## Custom Colors
 
-You can customize all colors used in the radar chart:
+You can customize all colors used in the radar chart. You only need to specify the colors you want to override - any omitted colors will use the defaults:
+
+```tsx
+import ResponsiveRadarChart from './components/ResponsiveRadarChart';
+
+// Override just the colors you want to change
+function MyApp() {
+  const values = [7, 5, 3, 8, 6, 4];
+
+  return (
+    <div style={{ width: '100%', height: '100vh' }}>
+      <ResponsiveRadarChart 
+        values={values}
+        colors={{
+          full: "#1E40AF",      // Override high score color
+          primary: "#1F2937",   // Override borders
+          // All other colors will use defaults
+        }}
+      />
+    </div>
+  );
+}
+```
+
+### Complete Color Customization
+
+For full control, you can specify all colors:
 
 ```tsx
 import ResponsiveRadarChart from './components/ResponsiveRadarChart';
@@ -153,7 +179,7 @@ export default ProjectDashboard;
 |------|------|----------|---------|-------------|
 | `values` | `number[]` | Yes | - | Array of values (0-10) for each sector |
 | `sectors` | `Sector[]` | No | Default wellness sectors | Array of sector definitions |
-| `colors` | `RadarChartColors` | No | Default color scheme | Custom color scheme |
+| `colors` | `Partial<RadarChartColors>` | No | Default color scheme | Custom color scheme (partial override supported) |
 
 ### Sector Type
 

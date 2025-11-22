@@ -1,6 +1,6 @@
 // Re-export types from types.ts
 export type { Sector, RadarChartColors } from './types';
-export { DEFAULT_RADAR_COLORS } from './types';
+export { DEFAULT_RADAR_COLORS, BORDER_OPACITY } from './types';
 
 // Convert polar coordinates to cartesian coordinates for SVG positioning
 export function polarToCartesian(

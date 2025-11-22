@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useMemo } from 'react';
-import { polarToCartesian, type Sector, type RadarChartColors, DEFAULT_RADAR_COLORS } from '../utils';
+import { polarToCartesian, type Sector, type RadarChartColors, DEFAULT_RADAR_COLORS, BORDER_OPACITY } from '../utils';
 
 // Responsive text sizing based on screen size
 function getResponsiveTextConfig(fontSize: number, iconSize: number) {
@@ -220,7 +220,7 @@ export default function IconLabelLayer({
                 cy={fy + iconCenterOffsetY}
                 r={Math.round(iconSize * 0.9) / 2}
                 fill={colors.iconBackground}
-                stroke={`${colors.primary}1A`}
+                stroke={`${colors.primary}${BORDER_OPACITY}`}
                 strokeWidth={1}
               />
               {/* Icon image */}
@@ -354,7 +354,7 @@ export default function IconLabelLayer({
                     alignItems: 'center',
                     justifyContent: 'center',
                     flexShrink: 0,
-                    border: `1px solid ${colors.primary}1A`,
+                    border: `1px solid ${colors.primary}${BORDER_OPACITY}`,
                     boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
                   }}
                 >

@@ -63,11 +63,11 @@ function getResponsiveConfig(size: number) {
 export default function ResponsiveRadarChart({ 
   values, 
   sectors = SECTORS,
-  colors = DEFAULT_RADAR_COLORS,
+  colors,
 }: { 
   values: number[];
   sectors?: Sector[];
-  colors?: RadarChartColors;
+  colors?: Partial<RadarChartColors>;
 }) {
   // Reference to the chart container for responsive sizing
   const containerRef = useRef<HTMLDivElement>(null);
@@ -78,6 +78,12 @@ export default function ResponsiveRadarChart({
   // Track if component is mounted to prevent memory leaks
   const isMountedRef = useRef(true);
   const [showLabels, setShowLabels] = useState(false);
+
+  // Merge provided colors with defaults
+  const mergedColors: RadarChartColors = useMemo(() => ({
+    ...DEFAULT_RADAR_COLORS,
+    ...colors,
+  }), [colors]);
 
   // Debounced resize handler to improve performance
   const debouncedResize = useDebounce(() => {
@@ -202,8 +208,8 @@ export default function ResponsiveRadarChart({
           cx={calculations.center} 
           cy={calculations.center} 
           r={config.centerRadius} 
-          fill={colors.background} 
-          stroke={colors.primary} 
+          fill={mergedColors.background} 
+          stroke={mergedColors.primary} 
           strokeWidth="2"
           filter="url(#centerShadow)"
         />
@@ -274,7 +280,7 @@ export default function ResponsiveRadarChart({
             barWidth={config.barWidth}
             gap={config.gap}
             sectors={sectors}
-            colors={colors}
+            colors={mergedColors}
             onProgress={handleProgress}
             onBarsComplete={handleBarsComplete}
           />
@@ -292,7 +298,7 @@ export default function ResponsiveRadarChart({
             labelRadius={config.iconRadius}
             avoidRadius={calculations.guidelineInner}
             safetyGap={12}
-            colors={colors}
+            colors={mergedColors}
           />
         </g>
 
@@ -306,7 +312,7 @@ export default function ResponsiveRadarChart({
           avoidRadius={calculations.guidelineInner}
           safetyGap={12}
           showLabels={showLabels}
-          colors={colors}
+          colors={mergedColors}
         />
       </svg>
     </div>

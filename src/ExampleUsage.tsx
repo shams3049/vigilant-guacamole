@@ -2,6 +2,7 @@ import ResponsiveRadarChart from './components/ResponsiveRadarChart';
 import type { Sector, RadarChartColors } from './utils';
 
 // Example 1: Using default colors with custom sectors
+// NOTE: Update the icon paths to match your application's asset structure
 const TECH_SECTORS: Sector[] = [
   { label: 'Frontend', icon: '/assets/bewegung.svg', angle: 0 },
   { label: 'Backend', icon: '/assets/ernaehrung_genuss.svg', angle: 60 },
