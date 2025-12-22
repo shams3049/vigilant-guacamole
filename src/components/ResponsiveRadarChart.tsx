@@ -2,7 +2,8 @@ import React, { useRef, useState, useLayoutEffect, useCallback, useMemo } from '
 import RadarLayer from './RadarLayer';
 import GuideLinesLayer from './GuideLinesLayer';
 import IconLabelLayer from './IconLabelLayer';
-import type { Sector } from '../utils';
+import type { Sector, RadarChartColors } from '../utils';
+import { DEFAULT_RADAR_COLORS } from '../utils';
 
 // Define the radar chart sectors with their labels, icons, and angles
 // Starting from 0° (which becomes 12 o'clock after polarToCartesian offset) and proceeding clockwise in 60° increments
@@ -59,7 +60,15 @@ function getResponsiveConfig(size: number) {
   };
 }
 
-export default function ResponsiveRadarChart({ values }: { values: number[] }) {
+export default function ResponsiveRadarChart({ 
+  values, 
+  sectors = SECTORS,
+  colors,
+}: { 
+  values: number[];
+  sectors?: Sector[];
+  colors?: Partial<RadarChartColors>;
+}) {
   // Reference to the chart container for responsive sizing
   const containerRef = useRef<HTMLDivElement>(null);
   // State to store the current chart size
@@ -69,6 +78,12 @@ export default function ResponsiveRadarChart({ values }: { values: number[] }) {
   // Track if component is mounted to prevent memory leaks
   const isMountedRef = useRef(true);
   const [showLabels, setShowLabels] = useState(false);
+
+  // Merge provided colors with defaults
+  const mergedColors: RadarChartColors = useMemo(() => ({
+    ...DEFAULT_RADAR_COLORS,
+    ...colors,
+  }), [colors]);
 
   // Debounced resize handler to improve performance
   const debouncedResize = useDebounce(() => {
@@ -117,7 +132,7 @@ export default function ResponsiveRadarChart({ values }: { values: number[] }) {
     
     // Find the sector with the lowest score for the navigation pointer
     const minValueIndex = values.indexOf(Math.min(...values));
-    const pointerAngle = SECTORS[minValueIndex].angle;
+    const pointerAngle = sectors[minValueIndex].angle;
 
     return {
       center,
@@ -128,7 +143,7 @@ export default function ResponsiveRadarChart({ values }: { values: number[] }) {
       avgPercent,
       pointerAngle,
     };
-  }, [size, values, config]);
+  }, [size, values, config, sectors]);
 
   // Handle arrow click for wobble animation with cleanup
   const handleArrowClick = useCallback(() => {
@@ -193,8 +208,8 @@ export default function ResponsiveRadarChart({ values }: { values: number[] }) {
           cx={calculations.center} 
           cy={calculations.center} 
           r={config.centerRadius} 
-          fill="#F6E2CA" 
-          stroke="#3D5241" 
+          fill={mergedColors.background} 
+          stroke={mergedColors.primary} 
           strokeWidth="2"
           filter="url(#centerShadow)"
         />
@@ -211,7 +226,7 @@ export default function ResponsiveRadarChart({ values }: { values: number[] }) {
             onClick={handleArrowClick}
             role="button"
             tabIndex={0}
-            aria-label={`Navigation pointer pointing to lowest score: ${SECTORS[values.indexOf(Math.min(...values))].label}`}
+            aria-label={`Navigation pointer pointing to lowest score: ${sectors[values.indexOf(Math.min(...values))].label}`}
             onKeyDown={(e) => {
               if (e.key === 'Enter' || e.key === ' ') {
                 e.preventDefault();
@@ -264,7 +279,8 @@ export default function ResponsiveRadarChart({ values }: { values: number[] }) {
             radius={config.radius}
             barWidth={config.barWidth}
             gap={config.gap}
-            sectors={SECTORS}
+            sectors={sectors}
+            colors={mergedColors}
             onProgress={handleProgress}
             onBarsComplete={handleBarsComplete}
           />
@@ -273,7 +289,7 @@ export default function ResponsiveRadarChart({ values }: { values: number[] }) {
         {/* Render guidelines between sectors */}
         <g filter="url(#guideShadow)">
           <GuideLinesLayer
-            sectors={SECTORS}
+            sectors={sectors}
             center={calculations.center}
             innerRadius={calculations.guidelineInner}
             outerRadius={calculations.guidelineOuter}
@@ -282,12 +298,13 @@ export default function ResponsiveRadarChart({ values }: { values: number[] }) {
             labelRadius={config.iconRadius}
             avoidRadius={calculations.guidelineInner}
             safetyGap={12}
+            colors={mergedColors}
           />
         </g>
 
         {/* Render icons and labels for each sector */}
         <IconLabelLayer
-          sectors={SECTORS}
+          sectors={sectors}
           center={calculations.center}
           radius={config.iconRadius}
           iconSize={config.iconSize}
@@ -295,6 +312,7 @@ export default function ResponsiveRadarChart({ values }: { values: number[] }) {
           avoidRadius={calculations.guidelineInner}
           safetyGap={12}
           showLabels={showLabels}
+          colors={mergedColors}
         />
       </svg>
     </div>

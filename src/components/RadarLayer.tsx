@@ -1,17 +1,11 @@
 import React, { useEffect, useState, useMemo, useCallback, useRef } from 'react';
-import { polarToCartesian, describeArc, type Sector } from '../utils';
+import { polarToCartesian, describeArc, type Sector, type RadarChartColors, DEFAULT_RADAR_COLORS } from '../utils';
 
-const FULL_COLOR = "#3D5241";       // dark green (9-10)
-const MEDIUM_COLOR = "#7C987C";     // light green (7-8)
-const LOW_COLOR = "#FFAD4C";        // yellow (4-6)
-const LOWEST_COLOR = "#FF8B7B";     // red (0-3)
-const INACTIVE_COLOR = "#E0E0E0";
-
-function getStrengthColor(strength: number, max: number): string {
-  if (strength >= 9) return FULL_COLOR;       // dark green (9-10)
-  if (strength >= 7) return MEDIUM_COLOR;     // light green (7-8)
-  if (strength >= 4) return LOW_COLOR;        // yellow (4-6)
-  return LOWEST_COLOR;                        // red (0-3)
+function getStrengthColor(strength: number, max: number, colors: RadarChartColors): string {
+  if (strength >= 9) return colors.full;       // dark green (9-10)
+  if (strength >= 7) return colors.medium;     // light green (7-8)
+  if (strength >= 4) return colors.low;        // yellow (4-6)
+  return colors.lowest;                        // red (0-3)
 }
 
 export default function RadarLayer({
@@ -22,6 +16,7 @@ export default function RadarLayer({
   barWidth,
   gap,
   sectors,
+  colors = DEFAULT_RADAR_COLORS,
   onBarsComplete,
   onProgress,
 }: {
@@ -32,6 +27,7 @@ export default function RadarLayer({
   barWidth: number;
   gap: number;
   sectors: Sector[];
+  colors?: RadarChartColors;
   onBarsComplete?: () => void; // New: callback to notify when outward animation completes
   onProgress?: (visibleR: number) => void;
 }) {
@@ -50,7 +46,7 @@ export default function RadarLayer({
     
     return values.map((strength, sectorIndex) => {
       const baseAngle = sectors[sectorIndex].angle;
-      const sectorColor = getStrengthColor(strength, max);
+      const sectorColor = getStrengthColor(strength, max, colors);
       
       return {
         strength,
@@ -71,12 +67,12 @@ export default function RadarLayer({
             endAngle,
             active,
             path: describeArc(center, center, r, startAngle, endAngle),
-            color: active ? sectorColor : INACTIVE_COLOR,
+            color: active ? sectorColor : colors.inactive,
           };
         }),
       };
     });
-  }, [values, sectors, max, radius, barWidth, gap, center]);
+  }, [values, sectors, max, radius, barWidth, gap, center, colors]);
 
   // Drive a single outward wave counter shared by all sectors
   useEffect(() => {
